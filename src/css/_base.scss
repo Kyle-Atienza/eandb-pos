@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+body {
+  font-family: 'DM Sans', sans-serif;
+
+  color: $secondary;
+}
+
+.q-card {
+  border-radius: 20px !important;
+  width: 100%;
+
+  background-color: $dark;
+  color: $secondary;
+
+  &__section:first-child {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      height: 1px;
+      background-color: $secondary;
+      border-radius: 100px;
+    }
+  }
+
+  &__actions {
+    padding: 15px;
+  }
+
+  .q-btn {
+    border-radius: 15px;
+  }
+}
+
+.q-tab {
+  &__label {
+    text-transform: none;
+  }
+}
+
+.q-btn {
+  text-transform: none;
+}
+
+.q-chip {
+  margin: 0;
+}
