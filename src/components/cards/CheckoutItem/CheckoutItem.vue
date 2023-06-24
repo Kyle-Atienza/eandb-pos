@@ -3,28 +3,29 @@
     <div class="thumbnail">
       <img src="../../../assets/images/temp/temp-product.jpg" alt="" />
     </div>
-    <div class="item__details">
-      <div class="name text-h6">{{ data.name }}</div>
+    <!-- <div class="divider" /> -->
+    <div class="details">
+      <div class="name text-h6">{{ `${data.item.product.name}` }}</div>
       <div class="chips">
-        <q-chip class="chip" color="secondary" text-color="dark"> {{ data.variant }} </q-chip>
-        <q-chip class="chip" color="secondary" text-color="dark">
+        <q-chip class="chip" color="secondary" text-color="dark"> {{ data.item.variant }} </q-chip>
+        <q-chip v-if="data.item.modifier" class="chip" color="secondary" text-color="dark">
           <q-icon name="img:src/assets/images/icons/modifiers/flavor.svg" class="q-mr-xs" />
-          {{ data.modifier.value }}
+          {{ data.item.modifier.value }}
         </q-chip>
       </div>
     </div>
-    <div class="item__amount">
-      <div class="total text-h6">{{ parseAmount(data.amount * data.quantity) }}</div>
-      <q-input
-        type="number"
-        class="quantity"
-        outlined
-        rounded
-        dense
-        v-model="quantity"
-        color="primary"
-      />
-    </div>
+    <q-input
+      type="number"
+      class="quantity"
+      outlined
+      rounded
+      dense
+      v-model="quantity"
+      color="primary"
+    />
+    <div class="total text-h6">{{ parseAmount(data.item.amount * data.quantity) }}</div>
+    <!-- <div class="amount">
+    </div> -->
   </div>
 </template>
 
@@ -48,7 +49,7 @@ export default {
     });
 
     watch(quantity, () => {
-      invoice.updateItem(data.id, {
+      invoice.updateItem(data.item._id, {
         ...data,
         quantity: Number(quantity.value) ? Number(quantity.value) : 1,
       });
@@ -73,27 +74,31 @@ export default {
   padding: 10px;
   border-radius: 20px;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  grid-row: repeat(3, auto);
   gap: 15px;
 
   color: $dark;
+}
 
-  &__details {
-    flex: 1;
-  }
+.details {
+  flex: 1;
+}
 
-  &__amount {
-    width: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-right: 5px;
-  }
+.amount {
+  grid-column: 2/3;
+  /* width: 120px; */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: 5px;
+  position: relative;
 }
 
 .thumbnail {
-  width: 90px;
-  min-width: 90px;
+  /* width: 90px;
+  min-width: 90px; */
   aspect-ratio: 1/1;
   align-self: flex-start;
 
@@ -122,7 +127,8 @@ export default {
 }
 
 .quantity {
-  width: 60px;
+  /* display: flex; */
+  /* width: 60px; */
   font-size: 1.2rem;
 
   ::v-deep input {
@@ -137,5 +143,13 @@ export default {
       border: 0;
     }
   }
+}
+
+.total {
+  display: flex;
+  align-items: center;
+  text-align: end;
+  justify-content: flex-end;
+  font-size: 30px;
 }
 </style>

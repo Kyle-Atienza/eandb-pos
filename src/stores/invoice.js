@@ -13,7 +13,7 @@ export const useInvoiceStore = defineStore('invoice', {
   getters: {
     getTotal(state) {
       return state.items.reduce((amount, item) => {
-        const itemAmount = amount + item.quantity * item.amount;
+        const itemAmount = amount + item.quantity * item.item.amount;
         amount = itemAmount;
         return amount;
       }, 0);
@@ -34,17 +34,17 @@ export const useInvoiceStore = defineStore('invoice', {
       this.items.push(product);
     },
     removeItem(id) {
-      this.items = this.items.filter((item) => item.id !== id);
+      this.items = this.items.filter(({ item }) => item._id !== id);
     },
     updateItem(id, updatedData) {
-      const productIndex = this.items.map((item) => item.id).indexOf(id);
+      const productIndex = this.items.map(({ item }) => item._id).indexOf(id);
       this.items[productIndex] = updatedData;
     },
     hasItem(id) {
-      return this.items.map((item) => item.id).includes(id);
+      return this.items.map(({ item }) => item._id).includes(id);
     },
     findItem(id) {
-      return this.items.find((item) => item.id === id);
+      return this.items.find(({ item }) => item._id === id);
     },
     updateDetails(key, value) {
       this.details[key] = value;
@@ -56,7 +56,10 @@ export const useInvoiceStore = defineStore('invoice', {
         emailAddress: this.emailAddress,
         notes: this.notes,
         paymentMethod: this.paymentMethod,
-        items: this.items,
+        items: this.items.map((item) => ({
+          item: item.item._id,
+          quantity: item.quantity,
+        })),
       });
     },
     reset() {

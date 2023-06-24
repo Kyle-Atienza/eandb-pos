@@ -14,14 +14,19 @@
   <q-tab-panels v-if="invoice" v-model="tab" animated>
     <q-tab-panel class="q-py-md q-px-none" name="items">
       <checkout-items />
-      <div class="divider q-mt-xl q-mx-md" />
-      <h2 class="q-mx-md q-mt-md text-h4 text-right">{{ total }}</h2>
     </q-tab-panel>
 
     <q-tab-panel class="q-py-md q-px-none" name="information">
       <checkout-details />
     </q-tab-panel>
   </q-tab-panels>
+
+  <teleport-wrapper to=".footer-slot">
+    <div class="total">
+      <div class="divider" />
+      <h2 class="q-my-md q-mt-md text-h4 text-right">{{ total }}</h2>
+    </div>
+  </teleport-wrapper>
 </template>
 
 <script>
@@ -29,13 +34,16 @@ import { computed, onMounted, provide, ref } from 'vue';
 import { parseAmount } from 'src/helpers/utils';
 import { api } from 'src/boot/axios';
 import { useRoute } from 'vue-router';
+import TeleportWrapper from 'src/components/common/TeleportWrapper/TeleportWrapper.vue';
 import CheckoutItems from './CheckoutItemsPage.vue';
 import CheckoutDetails from './CheckoutDetailsPage.vue';
+import { getTotal } from '../helpers/invoice';
 
 export default {
   components: {
     CheckoutItems,
     CheckoutDetails,
+    TeleportWrapper,
   },
   setup() {
     const route = useRoute();
@@ -50,11 +58,7 @@ export default {
 
       const { items } = invoice.value;
 
-      const totalAmount = items?.reduce((amount, item) => {
-        const itemAmount = amount + item.quantity * item.amount;
-        amount = itemAmount;
-        return amount;
-      }, 0);
+      const totalAmount = getTotal(items);
 
       return parseAmount(totalAmount);
     });
@@ -64,6 +68,14 @@ export default {
         .get(`/invoices/${route.params.id}`)
         .then((res) => {
           const { data } = res;
+
+          console.log({
+            ...data,
+            items: data.items.map((item) => ({
+              ...item.item,
+              ...item,
+            })),
+          });
 
           invoice.value = data;
         })
@@ -109,6 +121,21 @@ export default {
 }
 
 .q-tab-panels {
+  flex: 1;
+  display: flex;
   background: linear-gradient(180deg, #3a6145 18.23%, rgba(58, 97, 69, 0) 100%);
+}
+
+::v-deep .q-panel {
+  height: inherit;
+}
+
+::v-deep .q-tab-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.total {
+  flex: 1;
 }
 </style>

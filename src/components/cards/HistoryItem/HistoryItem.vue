@@ -23,6 +23,7 @@
 import { DateTime } from 'luxon';
 import { computed } from 'vue';
 import { parseAmount } from 'src/helpers/utils';
+import { getTotal } from 'src/helpers/invoice';
 import ButtonWrapper from '../ButtonWrapper/ButtonWrapper.vue';
 
 export default {
@@ -42,10 +43,7 @@ export default {
       return `${data.items.length} items`;
     });
     const itemsAmount = computed(() => {
-      const totalAmount = data.items.reduce((total, item) => {
-        total += item.amount;
-        return total;
-      }, 0);
+      const totalAmount = getTotal(data.items);
 
       return parseAmount(totalAmount);
     });

@@ -41,7 +41,7 @@
 import { onMounted, ref } from 'vue';
 
 import { fetchData } from 'src/helpers/api';
-import { mapProductItems } from 'src/helpers/products';
+// import { mapProductItems } from 'src/helpers/products';
 
 import ProductCard from 'src/components/cards/ProductCard/ProductCard.vue';
 import FilterProducts from 'src/components/pages/counter/FilterProducts/FilterProducts.vue';
@@ -65,11 +65,11 @@ export default {
 
     const fetchProducts = (query) => {
       loading.value = true;
-      fetchData('/products', query)
+      fetchData('/products/items', query)
         .then((res) => {
           const { data } = res.data;
 
-          products.value = mapProductItems(data);
+          products.value = data;
         })
         .catch((err) => {
           console.log(err);

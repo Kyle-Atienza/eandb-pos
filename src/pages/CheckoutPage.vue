@@ -9,7 +9,7 @@
     <div v-if="!$route.path.includes('success')" class="footer">
       <div class="footer__amount">
         <p class="footer__amount--label text-subtitle2">Grand Total:</p>
-        <h2 class="text-h4">{{ parseAmount(invoice.getTotal) }}</h2>
+        <h2 class="text-h4">{{ parseAmount(getTotal(invoice.items)) }}</h2>
       </div>
       <div class="footer__actions">
         <q-btn
@@ -33,6 +33,7 @@ import { onMounted, ref } from 'vue';
 import { useInvoiceStore } from 'src/stores/invoice';
 
 import { parseAmount } from 'src/helpers/utils';
+import { getTotal } from 'src/helpers/invoice';
 
 import HeaderLayout from 'src/components/common/Header/HeaderLayout.vue';
 import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
@@ -116,6 +117,7 @@ export default {
       action,
 
       parseAmount,
+      getTotal,
     };
   },
 };

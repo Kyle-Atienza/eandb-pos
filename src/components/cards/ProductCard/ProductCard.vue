@@ -8,44 +8,23 @@
       <img v-else src="src/assets/images/temp/temp-product.jpg" alt="" />
     </div>
     <q-skeleton v-if="skeleton" class="card__name card__name--skeleton" type="text" />
-    <h3 v-else class="card__name">{{ data?.product.name }}</h3>
-    <div class="card__bottom">
-      <div v-if="skeleton" class="details">
-        <q-skeleton
-          v-for="(pill, index) in 3"
-          :key="index"
-          class="details__pill details__pill--skeleton"
-          type="text"
-        />
-      </div>
-      <div v-else class="details">
-        <div class="details__pill">
-          {{ parseAmount(data?.variant.amount) }}
-        </div>
-        <div class="details__pill">
-          {{ data?.variant.name }}
-        </div>
-        <div class="details__pill">
-          <q-icon name="img:src/assets/images/icons/modifiers/flavor.svg" />
-          {{ data?.modifier.value }}
-        </div>
-      </div>
-      <div class="actions">
-        <q-btn @click="quantity += 1" icon="add" flat class="action action--add" />
-        <q-btn
-          v-if="quantity"
-          @click="quantity -= 1"
-          icon="remove"
-          flat
-          class="action action--remove"
-        />
-      </div>
+    <h3 v-else class="card__name">{{ data?.name }}</h3>
+    <div v-if="data.amount" class="amount">{{ parseAmount(data?.amount) }}</div>
+    <div class="actions">
+      <q-btn @click="quantity += 1" icon="add" flat class="action action--add" />
+      <q-btn
+        v-if="quantity"
+        @click="quantity -= 1"
+        icon="remove"
+        flat
+        class="action action--remove"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { parseAmount, getProductItemId } from 'src/helpers/utils';
+import { parseAmount } from 'src/helpers/utils';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useInvoiceStore } from 'src/stores/invoice';
 
@@ -64,33 +43,26 @@ export default {
 
     onMounted(() => {
       if (!skeleton) {
-        quantity.value = invoice.findItem(getProductItemId(data))?.quantity || 0;
+        quantity.value = invoice.findItem(data._id)?.quantity || 0;
       }
     });
 
     const invoiceItem = computed(() => ({
-      id: getProductItemId(data),
-      ref: {
-        product: data.product._id,
-        variant: data.variant._id,
+      item: {
+        ...data,
       },
-      name: data.product.name,
-      brand: data.product.brand,
-      variant: data.variant.name,
-      amount: data.variant.amount,
-      modifier: data.modifier,
-      quantity: quantity.value,
+      quantity,
     }));
 
     watch(quantity, () => {
       if (quantity.value) {
-        if (!invoice.hasItem(getProductItemId(data))) {
+        if (!invoice.hasItem(data._id)) {
           invoice.addItem(invoiceItem.value);
         } else {
-          invoice.updateItem(getProductItemId(data), invoiceItem.value);
+          invoice.updateItem(data._id, invoiceItem.value);
         }
       } else {
-        invoice.removeItem(getProductItemId(data));
+        invoice.removeItem(data._id);
       }
     });
 
@@ -157,7 +129,7 @@ $gap: 8px;
     line-height: 1em;
     font-weight: 500;
     margin: 0;
-    color: $dark-page;
+    color: $dark;
 
     background-color: $secondary;
     padding: $gap;
@@ -199,12 +171,20 @@ $gap: 8px;
   }
 }
 
+.amount {
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1em;
+  color: $dark;
+}
+
 .actions {
   flex: 2;
   display: flex;
-  flex-direction: column;
   border-radius: 15px;
   overflow: hidden;
+
+  height: 80px;
 }
 
 .action {
