@@ -37,31 +37,36 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 export default {
-  setup() {
+  setup(_, { emit }) {
     const modal = ref(false);
-    const selected = ref([]);
+    const brand = ref([]);
+    const filter = reactive({
+      brand: [],
+    });
 
     const samplePills = ref(['E and B Farm', 'Three K', 'NutriPage']);
 
-    const isSelected = (name) => selected.value.includes(name);
+    const isSelected = (name) => filter.brand.includes(name);
     const onClickFilter = (name) => {
       if (isSelected(name)) {
-        selected.value = selected.value.filter((item) => item !== name);
+        filter.brand = filter.brand.filter((item) => item !== name);
       } else {
-        selected.value.push(name);
+        filter.brand.push(name);
       }
+      emit('onFilter', filter);
     };
 
     const reset = () => {
-      selected.value = [];
+      filter.brand = [];
     };
 
     return {
+      filter,
       modal,
-      selected,
+      brand,
       samplePills,
 
       onClickFilter,

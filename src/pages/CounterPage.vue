@@ -8,10 +8,10 @@
           class="header__search"
           placeholder="Search Products"
           icon="search"
-          v-model="searchValue"
+          v-model="search"
           indicator
         />
-        <filter-products class="header__filter" />
+        <filter-products @on-filter="setFilter" class="header__filter" />
       </div>
     </header-layout>
     <page-wrapper>
@@ -38,16 +38,14 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
-
-import { fetchData } from 'src/helpers/api';
-// import { mapProductItems } from 'src/helpers/products';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 import ProductCard from 'src/components/cards/ProductCard/ProductCard.vue';
 import FilterProducts from 'src/components/pages/counter/FilterProducts/FilterProducts.vue';
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 import HeaderLayout from 'src/components/common/Header/HeaderLayout.vue';
 import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
+import { api } from 'src/boot/axios';
 
 export default {
   components: {
@@ -59,13 +57,23 @@ export default {
     OutlinedTextInput,
   },
   setup() {
-    const searchValue = ref('');
+    const search = ref('');
+    let filter = reactive({
+      brand: [],
+    });
+
     const products = ref([]);
     const loading = ref(false);
 
-    const fetchProducts = (query) => {
+    const fetchProducts = () => {
       loading.value = true;
-      fetchData('/products/items', query)
+      api({
+        url: '/products/items',
+        params: {
+          search: search.value || '',
+          ...filter,
+        },
+      })
         .then((res) => {
           const { data } = res.data;
 
@@ -79,14 +87,24 @@ export default {
         });
     };
 
+    const setFilter = (data) => {
+      filter = data;
+      fetchProducts();
+    };
+
+    watch(search, () => fetchProducts());
     onMounted(() => {
       fetchProducts();
     });
 
     return {
-      searchValue,
+      search,
+      filter,
+
       products,
       loading,
+
+      setFilter,
     };
   },
 };
