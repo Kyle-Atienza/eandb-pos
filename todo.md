@@ -8,3 +8,6 @@
 
 # filtering
 - [ ] get filterable options from fetched data and use them as options in the filter modal
+
+# products
+- [ ] store product images on database
