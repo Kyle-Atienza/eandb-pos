@@ -63,7 +63,9 @@ module.exports = configure((/* ctx */) => ({
 
     // publicPath: '/',
     // analyze: true,
-    // env: {},
+    env: {
+      BASE_URL: 'http://localhost:1200',
+    },
     // rawDefine: {}
     // ignorePublicFolder: true,
     // minify: false,
