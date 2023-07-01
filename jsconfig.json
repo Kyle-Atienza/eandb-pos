@@ -35,5 +35,9 @@
     "dist",
     ".quasar",
     "node_modules"
-  ]
+  ],
+  "scripts": {
+    "build": "quasar build",
+    "deploy": "vercel"
+  }
 }
