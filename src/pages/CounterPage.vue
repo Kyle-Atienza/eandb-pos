@@ -68,7 +68,7 @@ export default {
     const fetchProducts = () => {
       loading.value = true;
       api({
-        url: '/products/items',
+        url: '/products',
         params: {
           search: search.value || '',
           ...filter,
@@ -77,7 +77,44 @@ export default {
         .then((res) => {
           const { data } = res.data;
 
-          products.value = data;
+          products.value = data.reduce((productItems, product) => {
+            const items = [];
+            product.variants.forEach((variant) => {
+              product.modifier.values.forEach((modifier) => {
+                items.push({
+                  id: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
+                  name: product.name,
+                  brand: product.brand,
+                  variant,
+                  modifier: {
+                    name: product.modifier.name,
+                    value: modifier,
+                  },
+                });
+              });
+            });
+
+            productItems.push(...items);
+            return productItems;
+          }, []);
+
+          /*
+          {
+            quantity: 0,
+            brand: "E and B Farm",
+            variant: {
+              name: "220g",
+              amount: 110,
+              _id: "64b766f8dbf53fa5213e22a1"
+            },
+            modifier: {
+              name: "flavor",
+              value: "Barbeque"
+            }
+          }
+          */
+
+          // products.value = data;
         })
         .catch((err) => {
           console.log(err);
@@ -135,5 +172,17 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+}
+
+@media screen and (min-width: $breakpoint-sm-min) {
+  .products {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (min-width: $breakpoint-lg-min) {
+  .products {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 </style>

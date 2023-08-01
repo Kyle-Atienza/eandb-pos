@@ -1,5 +1,5 @@
 {
-  "name": "org.eandb.pos",
+  "name": "org.eandpos.quasar.app",
   "displayName": "E & B POS",
   "version": "1.0.0",
   "description": "A sample Apache Cordova application that responds to the deviceready event.",
@@ -14,10 +14,5 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "cordova-android": "^10.1.2"
-  },
-  "cordova": {
-    "platforms": [
-      "android"
-    ]
   }
 }

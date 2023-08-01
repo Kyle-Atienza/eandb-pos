@@ -5,12 +5,12 @@
     </div>
     <!-- <div class="divider" /> -->
     <div class="details">
-      <div class="name text-h6">{{ `${data.item.product.name}` }}</div>
+      <div class="name text-h6">{{ getDisplayName(data) }}</div>
       <div class="chips">
-        <q-chip class="chip" color="secondary" text-color="dark"> {{ data.item.variant }} </q-chip>
-        <q-chip v-if="data.item.modifier" class="chip" color="secondary" text-color="dark">
+        <q-chip class="chip" color="secondary" text-color="dark"> {{ data.variant.name }} </q-chip>
+        <q-chip v-if="data.modifier" class="chip" color="secondary" text-color="dark">
           <q-icon name="img:src/assets/images/icons/modifiers/flavor.svg" class="q-mr-xs" />
-          {{ data.item.modifier.value }}
+          {{ data.modifier.value }}
         </q-chip>
       </div>
     </div>
@@ -23,7 +23,7 @@
       v-model="quantity"
       color="primary"
     />
-    <div class="total text-h6">{{ parseAmount(data.item.amount * data.quantity) }}</div>
+    <div class="total text-h6">{{ parseAmount(data.variant.amount * data.quantity) }}</div>
     <!-- <div class="amount">
     </div> -->
   </div>
@@ -32,6 +32,7 @@
 <script>
 import { parseAmount } from 'src/helpers/utils';
 import { useInvoiceStore } from 'src/stores/invoice';
+import { getDisplayName } from 'src/helpers/products';
 
 import { onMounted, ref, watch } from 'vue';
 
@@ -49,7 +50,7 @@ export default {
     });
 
     watch(quantity, () => {
-      invoice.updateItem(data.item._id, {
+      invoice.updateItem(data.id, {
         ...data,
         quantity: Number(quantity.value) ? Number(quantity.value) : 1,
       });
@@ -63,6 +64,7 @@ export default {
       quantity,
 
       parseAmount,
+      getDisplayName,
     };
   },
 };

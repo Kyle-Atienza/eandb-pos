@@ -5,10 +5,10 @@
         {{ quantity }}
       </div>
       <q-skeleton v-if="skeleton" height="100%" />
-      <img v-else src="src/assets/images/temp/temp-product.jpg" alt="" />
+      <img v-else :src="data.image" alt="" />
     </div>
     <q-skeleton v-if="skeleton" class="card__name card__name--skeleton" type="text" />
-    <h3 v-else class="card__name">{{ data?.name }}</h3>
+    <h3 v-else class="card__name">{{ getDisplayName(data) }}</h3>
     <div v-if="data.amount" class="amount">{{ parseAmount(data?.amount) }}</div>
     <div class="actions">
       <q-btn @click="quantity += 1" icon="add" flat class="action action--add" />
@@ -27,6 +27,7 @@
 import { parseAmount } from 'src/helpers/utils';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useInvoiceStore } from 'src/stores/invoice';
+import { getDisplayName } from 'src/helpers/products';
 
 export default {
   props: {
@@ -41,28 +42,30 @@ export default {
 
     const quantity = ref(0);
 
+    /* const displayName = computed(
+      () => `${data.name} ${data.variant.name} - ${data.modifier.value}`
+    ); */
+
     onMounted(() => {
       if (!skeleton) {
-        quantity.value = invoice.findItem(data._id)?.quantity || 0;
+        quantity.value = invoice.findItem(data.id)?.quantity || 0;
       }
     });
 
     const invoiceItem = computed(() => ({
-      item: {
-        ...data,
-      },
+      ...data,
       quantity,
     }));
 
     watch(quantity, () => {
       if (quantity.value) {
-        if (!invoice.hasItem(data._id)) {
+        if (!invoice.hasItem(data.id)) {
           invoice.addItem(invoiceItem.value);
         } else {
-          invoice.updateItem(data._id, invoiceItem.value);
+          invoice.updateItem(data.id, invoiceItem.value);
         }
       } else {
-        invoice.removeItem(data._id);
+        invoice.removeItem(data.id);
       }
     });
 
@@ -70,6 +73,8 @@ export default {
       parseAmount,
 
       quantity,
+
+      getDisplayName,
     };
   },
 };
