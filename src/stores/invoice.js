@@ -57,7 +57,9 @@ export const useInvoiceStore = defineStore('invoice', {
         notes: this.notes,
         paymentMethod: this.paymentMethod,
         items: this.items.map((item) => ({
-          item: item.item._id,
+          id: item._id,
+          item: item.key,
+          variant: item.variant._id,
           quantity: item.quantity,
         })),
       });

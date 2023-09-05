@@ -42,10 +42,6 @@ export default {
 
     const quantity = ref(0);
 
-    /* const displayName = computed(
-      () => `${data.name} ${data.variant.name} - ${data.modifier.value}`
-    ); */
-
     onMounted(() => {
       if (!skeleton) {
         quantity.value = invoice.findItem(data.id)?.quantity || 0;

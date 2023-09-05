@@ -1,7 +1,7 @@
 <template>
   <div class="checkout-item item">
     <div class="thumbnail">
-      <img src="../../../assets/images/temp/temp-product.jpg" alt="" />
+      <img :src="data.image" alt="" />
     </div>
     <!-- <div class="divider" /> -->
     <div class="details">

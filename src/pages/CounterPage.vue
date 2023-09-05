@@ -82,9 +82,12 @@ export default {
             product.variants.forEach((variant) => {
               product.modifier.values.forEach((modifier) => {
                 items.push({
-                  id: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
+                  // id: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
+                  key: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
+                  id: variant._id,
                   name: product.name,
                   brand: product.brand,
+                  image: variant.image,
                   variant,
                   modifier: {
                     name: product.modifier.name,

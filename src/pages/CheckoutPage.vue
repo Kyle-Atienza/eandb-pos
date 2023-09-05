@@ -67,12 +67,16 @@ export default {
           router.replace('success');
         })
         .catch((err) => {
-          popupRef.value.open(err.response.data.error._message, err.response.data.error.message, [
-            {
-              label: 'OK',
-              action: () => popupRef.value.close(),
-            },
-          ]);
+          if (err.message) {
+            popupRef.value.open(err.response.data.error._message, err.response.data.error.message, [
+              {
+                label: 'OK',
+                action: () => popupRef.value.close(),
+              },
+            ]);
+          } else {
+            console.log(err);
+          }
         })
         .finally(() => {
           $q.loading.hide();
