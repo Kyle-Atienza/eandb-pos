@@ -14,7 +14,7 @@ import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
 export default {
   components: { PageWrapper, HeaderLayout },
   setup() {
-    console.log(process.env.BASE_URL);
+    console.log('you should only see this in dev');
   },
 };
 </script>
