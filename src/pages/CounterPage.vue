@@ -79,7 +79,7 @@ export default {
 
           products.value = data.reduce((productItems, product) => {
             const items = [];
-            product.variants.forEach((variant) => {
+            product.variants?.forEach((variant) => {
               if (product.modifier.name) {
                 product.modifier.values.forEach((modifier) => {
                   items.push({
