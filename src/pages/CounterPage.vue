@@ -24,7 +24,7 @@
             skeleton
           />
         </div>
-        <div class="products">
+        <div v-else class="products">
           <product-card
             v-for="(product, index) in products"
             :key="index"
