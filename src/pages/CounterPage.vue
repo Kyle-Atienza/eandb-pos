@@ -83,7 +83,7 @@ export default {
               if (product.modifier.name) {
                 product.modifier.values.forEach((modifier) => {
                   items.push({
-                    key: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
+                    key: `${product._id}_${variant._id}_${modifier}`.replaceAll(' ', '-'),
                     id: variant._id,
                     name: product.name,
                     brand: product.brand,
@@ -97,7 +97,7 @@ export default {
                 });
               } else {
                 items.push({
-                  key: `${product.name}_${variant.name}`.replaceAll(' ', '-'),
+                  key: `${product._id}_${variant._id}`.replaceAll(' ', '-'),
                   id: variant._id,
                   name: product.name,
                   brand: product.brand,

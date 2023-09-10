@@ -35,6 +35,7 @@ import { parseAmount } from 'src/helpers/utils';
 import { api } from 'src/boot/axios';
 import { useRoute } from 'vue-router';
 import TeleportWrapper from 'src/components/common/TeleportWrapper/TeleportWrapper.vue';
+import { useQuasar } from 'quasar';
 import CheckoutItems from './CheckoutItemsPage.vue';
 import CheckoutDetails from './CheckoutDetailsPage.vue';
 import { getTotal } from '../helpers/invoice';
@@ -46,6 +47,7 @@ export default {
     TeleportWrapper,
   },
   setup() {
+    const $q = useQuasar();
     const route = useRoute();
 
     const tab = ref('items');
@@ -64,20 +66,15 @@ export default {
     });
 
     onMounted(() => {
+      $q.loading.show();
+
       api
         .get(`/invoices/${route.params.id}`)
         .then((res) => {
           const { data } = res;
 
-          console.log({
-            ...data,
-            items: data.items.map((item) => ({
-              ...item.item,
-              ...item,
-            })),
-          });
-
           invoice.value = data;
+          $q.loading.hide();
         })
         .catch((err) => {
           console.log(err);
