@@ -9,8 +9,6 @@ import axios from 'axios';
 // for each client)
 const api = axios.create({ baseURL: process.env.BASE_URL });
 
-console.log(process.env.BASE_URL);
-
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 

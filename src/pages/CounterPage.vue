@@ -111,22 +111,6 @@ export default {
             return productItems;
           }, []);
 
-          /*
-          {
-            quantity: 0,
-            brand: "E and B Farm",
-            variant: {
-              name: "220g",
-              amount: 110,
-              _id: "64b766f8dbf53fa5213e22a1"
-            },
-            modifier: {
-              name: "flavor",
-              value: "Barbeque"
-            }
-          }
-          */
-
           // products.value = data;
         })
         .catch((err) => {
@@ -143,6 +127,7 @@ export default {
     };
 
     watch(search, () => fetchProducts());
+
     onMounted(() => {
       fetchProducts();
     });
