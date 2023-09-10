@@ -5,7 +5,7 @@
       <q-card-section class="row">
         <div class="text-h6 col">Filter Items</div>
         <q-btn @click="reset" class="reset" unelevated color="secondary" text-color="black">
-          <div style="font-size: 1.5em">Reset</div>
+          <div style="font-size: 1em">Reset</div>
         </q-btn>
       </q-card-section>
 

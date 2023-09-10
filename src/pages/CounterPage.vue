@@ -80,21 +80,31 @@ export default {
           products.value = data.reduce((productItems, product) => {
             const items = [];
             product.variants.forEach((variant) => {
-              product.modifier.values.forEach((modifier) => {
+              if (product.modifier.name) {
+                product.modifier.values.forEach((modifier) => {
+                  items.push({
+                    key: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
+                    id: variant._id,
+                    name: product.name,
+                    brand: product.brand,
+                    image: variant.image,
+                    variant,
+                    modifier: {
+                      name: product.modifier.name,
+                      value: modifier,
+                    },
+                  });
+                });
+              } else {
                 items.push({
-                  // id: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
-                  key: `${product.name}_${variant.name}_${modifier}`.replaceAll(' ', '-'),
+                  key: `${product.name}_${variant.name}`.replaceAll(' ', '-'),
                   id: variant._id,
                   name: product.name,
                   brand: product.brand,
                   image: variant.image,
                   variant,
-                  modifier: {
-                    name: product.modifier.name,
-                    value: modifier,
-                  },
                 });
-              });
+              }
             });
 
             productItems.push(...items);

@@ -44,7 +44,7 @@ export default {
 
     onMounted(() => {
       if (!skeleton) {
-        quantity.value = invoice.findItem(data.id)?.quantity || 0;
+        quantity.value = invoice.findItem(data.key)?.quantity || 0;
       }
     });
 
@@ -55,13 +55,13 @@ export default {
 
     watch(quantity, () => {
       if (quantity.value) {
-        if (!invoice.hasItem(data.id)) {
+        if (!invoice.hasItem(data.key)) {
           invoice.addItem(invoiceItem.value);
         } else {
-          invoice.updateItem(data.id, invoiceItem.value);
+          invoice.updateItem(data.key, invoiceItem.value);
         }
       } else {
-        invoice.removeItem(data.id);
+        invoice.removeItem(data.key);
       }
     });
 

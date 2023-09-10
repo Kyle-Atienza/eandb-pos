@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { getTotal } from 'src/helpers/invoice';
 import { api } from 'src/boot/axios';
 
 export const useInvoiceStore = defineStore('invoice', {
@@ -11,13 +12,13 @@ export const useInvoiceStore = defineStore('invoice', {
     items: [],
   }),
   getters: {
-    getTotal(state) {
+    /* getTotal(state) {
       return state.items.reduce((amount, item) => {
         const itemAmount = amount + item.quantity * item.variant.amount;
         amount = itemAmount;
         return amount;
       }, 0);
-    },
+    }, */
     isEmpty(state) {
       return !state.items.length;
     },
@@ -33,18 +34,18 @@ export const useInvoiceStore = defineStore('invoice', {
     addItem(product) {
       this.items.push(product);
     },
-    removeItem(id) {
-      this.items = this.items.filter((item) => item.id !== id);
+    removeItem(key) {
+      this.items = this.items.filter((item) => item.key !== key);
     },
-    updateItem(id, updatedData) {
-      const productIndex = this.items.map((item) => item.id).indexOf(id);
+    updateItem(key, updatedData) {
+      const productIndex = this.items.map((item) => item.key).indexOf(key);
       this.items[productIndex] = updatedData;
     },
-    hasItem(id) {
-      return this.items.map((item) => item.id).includes(id);
+    hasItem(key) {
+      return this.items.map((item) => item.key).includes(key);
     },
-    findItem(id) {
-      return this.items.find((item) => item.id === id);
+    findItem(key) {
+      return this.items.find((item) => item.key === key);
     },
     updateDetails(key, value) {
       this.details[key] = value;
@@ -62,6 +63,7 @@ export const useInvoiceStore = defineStore('invoice', {
           variant: item.variant._id,
           quantity: item.quantity,
         })),
+        total: getTotal(this.items),
       });
     },
     reset() {

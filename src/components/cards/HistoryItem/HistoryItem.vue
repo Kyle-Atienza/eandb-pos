@@ -13,7 +13,7 @@
         </div>
       </div>
       <div class="item__amount">
-        <q-chip :label="itemsAmount" color="primary" text-color="secondary" />
+        <q-chip :label="parseAmount(data.total)" color="primary" text-color="secondary" />
       </div>
     </div>
   </button-wrapper>
@@ -53,6 +53,8 @@ export default {
 
       itemsCount,
       itemsAmount,
+
+      parseAmount,
     };
   },
 };

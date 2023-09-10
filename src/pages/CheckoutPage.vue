@@ -67,7 +67,7 @@ export default {
           router.replace('success');
         })
         .catch((err) => {
-          if (err.message) {
+          if (err.message && err.response) {
             popupRef.value.open(err.response.data.error._message, err.response.data.error.message, [
               {
                 label: 'OK',

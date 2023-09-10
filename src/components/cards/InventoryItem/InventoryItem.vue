@@ -1,19 +1,35 @@
 <template>
-  <q-expansion-item header-class="item__header" class="inventory-item item" v-model="expanded">
+  <q-expansion-item
+    header-class="item__header"
+    :class="[`inventory-item item`, isEditing ? 'item--edit' : '']"
+    v-model="expanded"
+  >
     <template v-slot:header>
       <div class="item__displayed">
         <div class="thumbnail">
-          <img src="../../../assets/images/temp/temp-product.jpg" alt="" />
+          <img :src="selectedVariant.image" alt="" />
         </div>
         <div class="details">
           <h2 class="name text-h6">{{ data.name }}</h2>
-          <q-chip v-if="selectedVariant.amount" class="amount" color="secondary" text-color="dark">
-            {{ parseAmount(selectedVariant.amount) }}
-          </q-chip>
+          <!-- <attribute-chip v-if="selectedVariant.amount" class="q-mt-md">
+            <span style="font-size: 1.1em">{{ parseAmount(selectedVariant.amount) }}</span>
+          </attribute-chip> -->
+          <q-input
+            v-if="selectedVariant.amount"
+            type="number"
+            class=""
+            outlined
+            rounded
+            dense
+            v-model="amount"
+            v-on:click.stop
+            :disable="!isEditing"
+            color="primary"
+          />
         </div>
-        <div class="actions">
+        <div class="toggle">
           <q-btn
-            class="action"
+            class="toggle__button"
             unelevated
             color="dark"
             size="sm"
@@ -26,30 +42,54 @@
     <div class="item__expandable">
       <div class="item__divider" />
 
-      <div class="variants">
-        <div class="variant">
-          <h4 class="variant__label text-subtitle1">Variants</h4>
-          <div class="variant__chips">
-            <variant-chip
-              v-for="(variant, index) in data.variants"
-              :key="index"
-              :label="variant.name"
-              :selected="variant.name === selectedVariant.name"
-              @click="selectedVariant = variant"
-            />
+      <div class="attributes">
+        <div class="attribute-list">
+          <h4 class="attribute-list__label text-subtitle1">Variants</h4>
+          <div class="flex">
+            <div class="attribute-list__chips">
+              <attribute-chip
+                v-for="(variant, index) in data.variants"
+                :key="index"
+                :selected="variant.name === selectedVariant.name"
+                @click="selectedVariant = variant"
+              >
+                {{ variant.name }}
+              </attribute-chip>
+            </div>
           </div>
         </div>
 
-        <div v-for="(modifier, index) in data.modifiers" :key="index" class="variant">
-          <h4 class="variant__label text-subtitle1">{{ capitalizeCase(modifier.name) }}</h4>
-          <div class="variant__chips">
-            <variant-chip
-              v-for="(modifier, index) in modifier.values"
-              :key="index"
-              :label="modifier"
-              @click="onSelectVariant(category, value)"
-            />
+        <div class="attribute-list">
+          <h4 class="attribute-list__label text-subtitle1">Modifiers</h4>
+          <div class="attribute-list__chips">
+            <attribute-chip v-for="(variant, index) in data.modifier.values" :key="index">
+              {{ variant }}
+            </attribute-chip>
+            <attribute-chip :edit="isEditing" />
           </div>
+        </div>
+      </div>
+
+      <div class="actions q-mt-lg">
+        <h4 class="q-my-none text-subtitle1">Actions</h4>
+        <div class="flex q-gutter-sm">
+          <q-btn
+            class="col"
+            padding="sm"
+            unelevated
+            label="Edit"
+            color="primary"
+            style="font-size: 1.1em"
+            @click="isEditing = !isEditing"
+          />
+          <q-btn
+            class="col"
+            padding="sm"
+            unelevated
+            label="Delete"
+            color="negative"
+            style="font-size: 1.1em"
+          />
         </div>
       </div>
     </div>
@@ -59,11 +99,11 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { capitalizeCase, parseAmount } from 'src/helpers/utils';
-import VariantChip from './VariantChip.vue';
+import AttributeChip from './AttributeChip.vue';
 
 export default {
   components: {
-    VariantChip,
+    AttributeChip,
   },
   props: {
     data: Object,
@@ -71,10 +111,13 @@ export default {
   setup({ data }) {
     const expanded = ref(false);
     const selectedVariant = ref({});
+    const isEditing = ref(false);
+    const amount = ref(0);
 
     const setDefaultVariant = () => {
       const defaultVariant = data.variants[0];
       selectedVariant.value = defaultVariant;
+      amount.value = defaultVariant.amount;
     };
 
     onMounted(() => {
@@ -84,6 +127,8 @@ export default {
     return {
       expanded,
       selectedVariant,
+      isEditing,
+      amount,
 
       capitalizeCase,
       parseAmount,
@@ -94,7 +139,7 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep .q-item {
-  pointer-events: none;
+  /* pointer-events: none; */
 
   &__section {
     &--side {
@@ -107,6 +152,8 @@ export default {
   background-color: $accent;
   padding: 10px;
   border-radius: 20px;
+
+  transition: background 0.2s ease-in-out;
 
   color: $dark;
 
@@ -125,6 +172,10 @@ export default {
     background: $dark;
     margin: 15px 0 10px;
     border-radius: 100px;
+  }
+
+  &--edit {
+    background: $negative;
   }
 }
 
@@ -161,7 +212,7 @@ export default {
   margin-top: 8px;
 }
 
-.actions {
+.toggle {
   width: 30px;
   height: 100px;
   display: flex;
@@ -169,6 +220,12 @@ export default {
   gap: 8px;
 
   pointer-events: auto;
+
+  &__button {
+    border-radius: 15px;
+    /* flex: 1; */
+    width: 100%;
+  }
 }
 
 .action {
@@ -177,8 +234,8 @@ export default {
   width: 100%;
 }
 
-.variants {
-  padding: 0 5px 5px 5px;
+.attributes {
+  /* padding: 0 5px 5px 5px; */
 
   &__edit {
     border-radius: 15px;
@@ -189,7 +246,7 @@ export default {
   }
 }
 
-.variant {
+.attribute-list {
   &:not(:first-of-type) {
     margin-top: 10px;
   }

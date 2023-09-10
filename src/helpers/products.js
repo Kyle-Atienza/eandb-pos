@@ -8,6 +8,11 @@ const mapProductItems = (products) => {
   return mappedProducts;
 };
 
-const getDisplayName = (item) => `${item.name} ${item.variant.name} - ${item.modifier.value}`;
+const getDisplayName = (item) => {
+  if (item.modifier?.name) {
+    return `${item.name} ${item.variant.name} - ${item.modifier.value}`;
+  }
+  return `${item.name} ${item.variant.name}`;
+};
 
 export { mapProductItems, getDisplayName };

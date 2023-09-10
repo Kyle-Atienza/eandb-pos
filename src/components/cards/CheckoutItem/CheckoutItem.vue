@@ -1,7 +1,7 @@
 <template>
   <div class="checkout-item item">
     <div class="thumbnail">
-      <img :src="data.image" alt="" />
+      <img :src="data.variant.image" alt="" />
     </div>
     <!-- <div class="divider" /> -->
     <div class="details">
@@ -50,7 +50,7 @@ export default {
     });
 
     watch(quantity, () => {
-      invoice.updateItem(data.id, {
+      invoice.updateItem(data.key, {
         ...data,
         quantity: Number(quantity.value) ? Number(quantity.value) : 1,
       });
