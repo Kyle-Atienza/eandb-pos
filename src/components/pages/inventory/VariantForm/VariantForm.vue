@@ -42,7 +42,7 @@
 <script>
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 
-import { useProductsStore } from 'src/stores/products';
+import { useInventoryStore } from 'src/stores/inventory';
 
 import { computed, inject, onMounted, ref, watch } from 'vue';
 import { api } from 'src/boot/axios';
@@ -59,13 +59,13 @@ export default {
   emits: ['close'],
   setup(props, { attrs, emit }) {
     const $q = useQuasar();
-    const productsStore = useProductsStore();
+    const inventoryStore = useInventoryStore();
 
     const variant = ref({});
     const selected = inject('selected');
     const isUpdating = inject('isUpdating');
 
-    const products = computed(() => productsStore.items);
+    const products = computed(() => inventoryStore.products);
 
     const otherVariants = computed(() => {
       const output = selected.value.product.variants.filter(
@@ -107,7 +107,7 @@ export default {
             (product) => product._id !== selected.value.product._id
           );
 
-          productsStore.setItems([...otherProducts, res.data]);
+          inventoryStore.setProducts([...otherProducts, res.data]);
 
           emit('close');
           $q.loading.hide();

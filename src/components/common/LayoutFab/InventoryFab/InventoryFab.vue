@@ -31,7 +31,7 @@
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 import SelectInput from 'src/components/forms/SelectInput/SelectInput.vue';
 
-import { useProductsStore } from 'src/stores/products';
+import { useInventoryStore } from 'src/stores/inventory';
 
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
@@ -45,7 +45,7 @@ export default {
   setup() {
     const $q = useQuasar();
 
-    const productsStore = useProductsStore();
+    const inventoryStore = useInventoryStore();
 
     const dialog = ref();
     const product = ref({
@@ -65,7 +65,7 @@ export default {
         data: product.value,
       })
         .then((res) => {
-          productsStore.insertItem(res.data);
+          inventoryStore.insertProduct(res.data);
         })
         .catch((err) => {
           console.log(err);

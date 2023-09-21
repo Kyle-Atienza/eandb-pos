@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import { useProductsStore } from 'src/stores/products';
+import { useInventoryStore } from 'src/stores/inventory';
 
 import { onMounted, provide, ref } from 'vue';
 import { capitalizeCase, parseAmount } from 'src/helpers/utils';
@@ -138,7 +138,7 @@ export default {
   setup({ data }) {
     const $q = useQuasar();
 
-    const productsStore = useProductsStore();
+    const inventoryStore = useInventoryStore();
 
     const expanded = ref(false);
     const isUpdating = ref(false);
@@ -169,7 +169,7 @@ export default {
       api
         .delete(`/products/${data._id}`)
         .then(() => {
-          productsStore.deleteItem(data._id);
+          inventoryStore.deleteProduct(data._id);
         })
         .catch((err) => {
           console.log(err);
