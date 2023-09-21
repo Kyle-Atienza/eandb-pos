@@ -48,7 +48,7 @@ export default {
   }
 
   &--dense {
-    font-size: 0.7em;
+    font-size: 1em;
   }
 
   /* &--empty {

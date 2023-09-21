@@ -2,8 +2,13 @@
   <header-layout label="Inventory" />
   <q-page>
     <page-wrapper>
-      <div class="q-mx-md inventory-items">
-        <inventory-item v-for="(product, index) in products" :key="index" :data="product" />
+      <div :key="items.length" class="q-mx-md inventory-items">
+        <inventory-item
+          v-for="(product, index) in items"
+          :key="index"
+          :data="product"
+          @update="(product) => openProductDialog(product)"
+        />
       </div>
     </page-wrapper>
   </q-page>
@@ -13,7 +18,10 @@
 import HeaderLayout from 'src/components/common/Header/HeaderLayout.vue';
 import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
 import InventoryItem from 'src/components/cards/InventoryItem/InventoryItem.vue';
-import { onMounted, ref } from 'vue';
+
+import { useProductsStore } from 'src/stores/products';
+
+import { computed, onMounted, reactive, watch } from 'vue';
 import { api } from 'src/boot/axios';
 
 export default {
@@ -23,7 +31,17 @@ export default {
     InventoryItem,
   },
   setup() {
-    const products = ref();
+    const productsStore = useProductsStore();
+    const items = computed(() => productsStore.items);
+
+    const updateProduct = reactive({
+      dialog: {
+        isOpen: false,
+        form: '',
+      },
+      id: '',
+      data: {},
+    });
 
     onMounted(() => {
       api
@@ -31,16 +49,18 @@ export default {
         .then((res) => {
           const { data } = res.data;
 
-          products.value = data;
+          productsStore.setItems(data);
         })
         .catch((err) => {
           console.log(err);
         });
     });
 
-    return {
-      products,
-    };
+    watch(items, () => {
+      console.log('items updated');
+    });
+
+    return { items, updateProduct };
   },
 };
 </script>

@@ -163,6 +163,7 @@ export default {
 
   &__search {
     flex: 1;
+    font-size: 16px;
   }
 }
 
