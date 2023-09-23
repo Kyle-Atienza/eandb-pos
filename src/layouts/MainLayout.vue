@@ -9,7 +9,8 @@
     <q-page-container>
       <router-view />
       <q-page-sticky position="bottom-right" :offset="[18, 18]">
-        <checkout-fab />
+        <layout-fab />
+        <checkout-fab v-if="false" />
       </q-page-sticky>
     </q-page-container>
 
@@ -40,6 +41,7 @@
 
 <script>
 import CheckoutFab from 'src/components/common/CounterFab/CounterFab.vue';
+import LayoutFab from 'src/components/common/LayoutFab/LayoutFab.vue';
 
 import { useInvoiceStore } from 'src/stores/invoice';
 import { ref } from 'vue';
@@ -48,6 +50,7 @@ export default {
   name: 'MainLayout',
   components: {
     CheckoutFab,
+    LayoutFab,
   },
   setup() {
     const invoice = useInvoiceStore();

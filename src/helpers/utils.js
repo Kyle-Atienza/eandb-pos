@@ -13,6 +13,50 @@ const getProductItemId = (data) => {
   return `${productInitials}-${variantName}-${modifierString}`;
 };
 
+const alphanumericSort = (array, key) => {
+  const sorted = array.sort((a, b) => {
+    const nameA = key ? a[key].toLowerCase() : a.toLowerCase();
+    const nameB = key ? b[key].toLowerCase() : b.toLowerCase();
+
+    if (nameA > nameB) {
+      return 1;
+    }
+    if (nameA < nameB) {
+      return -1;
+    }
+    return 0;
+  });
+
+  return sorted;
+};
+
 const capitalizeCase = (text) => text.slice(0, 1).toUpperCase() + text.slice(1);
 
-export { parseAmount, getProductItemId, capitalizeCase };
+const checkEmptyObjectValues = (object, allowed = []) => {
+  const keys = Object.keys(object).filter((key) => !allowed.includes(key));
+
+  const emptyValues = keys.reduce((empty, key) => {
+    if (!object[key]) {
+      empty.push(key);
+    }
+
+    return empty;
+  }, []);
+
+  return emptyValues;
+};
+
+const mapEmptyFieldErrorMessage = (errorArray) => {
+  const errorMessage = errorArray.map((field) => `${capitalizeCase(field)} is required`).join('\n');
+
+  return errorMessage;
+};
+
+export {
+  parseAmount,
+  getProductItemId,
+  capitalizeCase,
+  alphanumericSort,
+  checkEmptyObjectValues,
+  mapEmptyFieldErrorMessage,
+};

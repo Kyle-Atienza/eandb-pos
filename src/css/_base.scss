@@ -52,3 +52,51 @@ body {
 .q-chip {
   margin: 0;
 }
+
+.q-select__dialog {
+  background: $dark;
+  border: 2px solid $secondary;
+  border-radius: 15px !important;
+
+  .q-field__native {
+    color: $secondary;
+    font-size: 2em;
+    line-height: 1em;
+    font-weight: 400;
+    padding-bottom: 12px;
+  }
+
+  .q-field__control {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .q-field__control-container {
+    padding-top: 40px !important;
+  }
+
+  .q-field__label {
+    background: $secondary;
+    padding: 0.2em 0.5em;
+    border-radius: 999px;
+    top: 24px;
+    color: $dark;
+  }
+}
+
+.q-field {
+  &--with-bottom {
+    padding: 0;
+  }
+  &__bottom {
+    display: none;
+  }
+
+  &--outlined .q-field__control{
+    border-radius: 13px;
+  }
+
+  /* &__control::before,
+  &__control::after {
+    border-radius: 13px !important;
+  } */
+}
