@@ -37,10 +37,13 @@
       <q-btn class="col" unelevated label="Delete" color="negative" @click="deleteVariant" />
     </q-card-actions>
   </q-card>
+
+  <alert-popup ref="alert" />
 </template>
 
 <script>
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
+import AlertPopup from 'src/components/common/AlertPopup/AlertPopup.vue';
 
 import { useInventoryStore } from 'src/stores/inventory';
 
@@ -52,6 +55,7 @@ import { useQuasar } from 'quasar';
 export default {
   components: {
     OutlinedTextInput,
+    AlertPopup,
   },
   props: {
     update: Boolean,
@@ -61,20 +65,26 @@ export default {
     const $q = useQuasar();
     const inventoryStore = useInventoryStore();
 
+    const alert = ref(null);
     const variant = ref({});
     const selected = inject('selected');
-    const isUpdating = inject('isUpdating');
+    const product = inject('product');
+
+    // const isUpdating = inject('isUpdating');
 
     const products = computed(() => inventoryStore.products);
+    const isUpdating = computed(
+      () => inventoryStore.updatingProduct && inventoryStore.updatingProduct._id === product._id
+    );
 
     const otherVariants = computed(() => {
-      const output = selected.value.product.variants.filter(
+      const output = inventoryStore.updatingProduct.variants.filter(
         (data) => data._id !== selected.value.variant._id
       );
 
       return output;
     });
-    const params = computed(() => new URLSearchParams(`id=${selected.value.product._id}`));
+    const params = computed(() => new URLSearchParams(`id=${inventoryStore.updatingProduct._id}`));
 
     const setData = () => {
       if (!attrs.create) {
@@ -104,16 +114,31 @@ export default {
       request()
         .then((res) => {
           const otherProducts = products.value.filter(
-            (product) => product._id !== selected.value.product._id
+            (item) => item._id !== inventoryStore.updatingProduct._id
           );
 
-          inventoryStore.setProducts([...otherProducts, res.data]);
+          inventoryStore.setProducts([
+            ...otherProducts,
+            {
+              ...res.data,
+              updating: true,
+            },
+          ]);
 
           emit('close');
-          $q.loading.hide();
         })
         .catch((err) => {
-          console.log(err);
+          alert.value.open('Variant Error', err.response.data.error.message, [
+            {
+              label: 'OK',
+              action: () => {
+                alert.value.close();
+              },
+            },
+          ]);
+        })
+        .finally(() => {
+          $q.loading.hide();
         });
     };
 
@@ -126,7 +151,8 @@ export default {
     };
 
     const createVariant = () => {
-      onUpdate(() => api(variantRequest([...selected.value.product.variants, variant.value])));
+      const payload = [...inventoryStore.updatingProduct.variants, variant.value];
+      onUpdate(() => api(variantRequest(payload)));
     };
 
     const uploadImage = (image) => {
@@ -136,6 +162,8 @@ export default {
     };
 
     return {
+      alert,
+
       variant,
       selected,
       isUpdating,

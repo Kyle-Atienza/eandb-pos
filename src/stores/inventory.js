@@ -4,8 +4,13 @@ import { api } from 'src/boot/axios';
 export const useInventoryStore = defineStore('inventory', {
   state: () => ({
     products: [],
+    isUpdating: false,
   }),
-  getters: {},
+  getters: {
+    updatingProduct(state) {
+      return state.products.find((product) => product.updating === true);
+    },
+  },
   actions: {
     setProducts(products) {
       this.products = [...products];
@@ -15,6 +20,33 @@ export const useInventoryStore = defineStore('inventory', {
     },
     deleteProduct(id) {
       this.products = this.products.filter((item) => item._id !== id);
+    },
+    toggleProductUpdate(id) {
+      if (this.updatingProduct && this.updatingProduct._id === id) {
+        this.products = this.products.map((product) => ({
+          ...product,
+          updating: false,
+        }));
+      } else {
+        this.products = this.products.map((product) => {
+          if (product._id === id) {
+            return {
+              ...product,
+              updating: true,
+            };
+          }
+          return {
+            ...product,
+            updating: false,
+          };
+        });
+      }
+    },
+    stopUpdate() {
+      this.products = this.products.map((product) => ({
+        ...product,
+        updating: false,
+      }));
     },
     async fetchItems() {
       api

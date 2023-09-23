@@ -46,19 +46,8 @@ export default {
   setup() {
     const dialog = ref('false');
 
-    const removeItem = () => {
-      console.log('remove');
-    };
-
-    const addItem = () => {
-      console.log('remove');
-    };
-
     return {
       dialog,
-
-      removeItem,
-      addItem,
     };
   },
 };

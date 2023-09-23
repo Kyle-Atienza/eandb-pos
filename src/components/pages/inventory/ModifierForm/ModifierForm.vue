@@ -45,18 +45,21 @@ export default {
 
     const modifier = ref('');
     const selected = inject('selected');
-    const isUpdating = inject('isUpdating');
+    const product = inject('product');
 
     const products = computed(() => inventoryStore.products);
+    const isUpdating = computed(
+      () => inventoryStore.updatingProduct && inventoryStore.updatingProduct._id === product._id
+    );
 
     const otherModifiers = computed(() => {
-      const output = selected.value.product.modifier.values.filter(
+      const output = inventoryStore.updatingProduct.modifier.values.filter(
         (value) => value !== selected.value.modifier
       );
 
       return output;
     });
-    const params = computed(() => new URLSearchParams(`id=${selected.value.product._id}`));
+    const params = computed(() => new URLSearchParams(`id=${inventoryStore.updatingProduct._id}`));
 
     const setData = () => {
       if (!attrs.create) {
@@ -78,7 +81,7 @@ export default {
       params: params.value,
       data: {
         modifier: {
-          name: selected.value.product.modifier.name,
+          name: inventoryStore.updatingProduct.modifier.name,
           values,
         },
       },
@@ -89,9 +92,15 @@ export default {
       request()
         .then((res) => {
           const otherProducts = products.value.filter(
-            (product) => product._id !== selected.value.product._id
+            (item) => item._id !== inventoryStore.updatingProduct._id
           );
-          inventoryStore.setProducts([...otherProducts, res.data]);
+          inventoryStore.setProducts([
+            ...otherProducts,
+            {
+              ...res.data,
+              updating: true,
+            },
+          ]);
 
           emit('close');
           $q.loading.hide();
@@ -110,7 +119,8 @@ export default {
     };
 
     const createModifier = () => {
-      onUpdate(() => api(modifierRequest([...otherModifiers.value, modifier.value])));
+      const payload = [...inventoryStore.updatingProduct.modifier.values, modifier.value];
+      onUpdate(() => api(modifierRequest(payload)));
     };
 
     return {

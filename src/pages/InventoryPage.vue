@@ -4,10 +4,11 @@
     <page-wrapper>
       <div :key="products.length" class="q-mx-md inventory-items">
         <inventory-item
-          v-for="(product, index) in products"
+          v-for="(product, index) in alphanumericSort(products, 'name')"
           :key="index"
           :data="product"
           @update="(product) => openProductDialog(product)"
+          v-bind="$attrs"
         />
       </div>
     </page-wrapper>
@@ -21,7 +22,8 @@ import InventoryItem from 'src/components/cards/InventoryItem/InventoryItem.vue'
 
 import { useInventoryStore } from 'src/stores/inventory';
 
-import { computed, onMounted, reactive, watch } from 'vue';
+import { computed, onBeforeUpdate, onMounted, ref } from 'vue';
+import { alphanumericSort } from 'src/helpers/utils';
 import { api } from 'src/boot/axios';
 
 export default {
@@ -34,13 +36,10 @@ export default {
     const inventoryStore = useInventoryStore();
     const products = computed(() => inventoryStore.products);
 
-    const updateProduct = reactive({
-      dialog: {
-        isOpen: false,
-        form: '',
-      },
-      id: '',
-      data: {},
+    const inventoryItems = ref([]);
+
+    onBeforeUpdate(() => {
+      inventoryItems.value = [];
     });
 
     onMounted(() => {
@@ -55,12 +54,7 @@ export default {
           console.log(err);
         });
     });
-
-    watch(products, () => {
-      console.log('items updated');
-    });
-
-    return { products, updateProduct };
+    return { products, alphanumericSort };
   },
 };
 </script>

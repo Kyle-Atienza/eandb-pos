@@ -1,5 +1,7 @@
 <template>
   <q-expansion-item
+    :ref="`inventoryItem-${data._id}`"
+    group="inventoryItems"
     header-class="item__header"
     :class="[`inventory-item item`, isUpdating ? 'item--edit' : '']"
     v-model="expanded"
@@ -29,7 +31,7 @@
             <div class="flex">
               <div class="attribute-list__chips">
                 <attribute-chip
-                  v-for="(variant, index) in data.variants"
+                  v-for="(variant, index) in alphanumericSort(data.variants, 'name')"
                   :key="index"
                   :selected="variant.name === selected.variant?.name"
                   :update="isUpdating"
@@ -69,7 +71,7 @@
           </h4>
           <div class="attribute-list__chips">
             <attribute-chip
-              v-for="(modifier, index) in data.modifier.values"
+              v-for="(modifier, index) in alphanumericSort(data.modifier.values, null)"
               :key="index"
               :update="isUpdating"
               @click="selected.modifier = modifier"
@@ -91,20 +93,10 @@
             :label="isUpdating ? 'Done' : 'Edit'"
             color="primary"
             style="font-size: 1.1em"
-            @click="onUpdate"
+            @click="inventoryStore.toggleProductUpdate(data._id)"
           />
           <q-btn
-            v-if="isUpdating"
-            class="col"
-            padding="sm"
-            unelevated
-            label="Cancel"
-            color="secondary"
-            style="font-size: 1.1em"
-            outline
-          />
-          <q-btn
-            v-else
+            v-if="!isUpdating"
             class="col"
             padding="sm"
             unelevated
@@ -120,12 +112,15 @@
 </template>
 
 <script>
+import { computed, onMounted, provide, ref } from 'vue';
+
+import { alphanumericSort, capitalizeCase, parseAmount } from 'src/helpers/utils';
+import { api } from 'src/boot/axios';
+
+import { useQuasar } from 'quasar';
+
 import { useInventoryStore } from 'src/stores/inventory';
 
-import { onMounted, provide, ref } from 'vue';
-import { capitalizeCase, parseAmount } from 'src/helpers/utils';
-import { useQuasar } from 'quasar';
-import { api } from 'src/boot/axios';
 import AttributeChip from './AttributeChip.vue';
 
 export default {
@@ -137,11 +132,14 @@ export default {
   },
   setup({ data }) {
     const $q = useQuasar();
-
     const inventoryStore = useInventoryStore();
 
+    const inventoryItem = ref(null);
     const expanded = ref(false);
-    const isUpdating = ref(false);
+
+    const isUpdating = computed(
+      () => inventoryStore.updatingProduct && inventoryStore.updatingProduct._id === data._id
+    );
 
     const selected = ref({
       product: {},
@@ -157,11 +155,6 @@ export default {
     const onAttributeClick = (callback) => {
       selected.value.product = data;
       callback();
-    };
-
-    const onUpdate = () => {
-      selected.value.product = data;
-      isUpdating.value = !isUpdating.value;
     };
 
     const deleteProduct = () => {
@@ -186,17 +179,21 @@ export default {
 
     provide('selected', selected);
     provide('isUpdating', isUpdating);
+    provide('product', data);
 
     return {
+      inventoryItem,
       expanded,
       isUpdating,
       selected,
 
-      onUpdate,
+      inventoryStore,
+
       capitalizeCase,
       parseAmount,
       onAttributeClick,
       deleteProduct,
+      alphanumericSort,
     };
   },
 };
