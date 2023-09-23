@@ -6,7 +6,7 @@
       </q-card-section>
 
       <q-card-section>
-        <div class="text-subtitle1">{{ content }}</div>
+        <div class="text-subtitle1 content">{{ content }}</div>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -51,4 +51,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.content {
+  white-space: pre-line;
+}
+</style>

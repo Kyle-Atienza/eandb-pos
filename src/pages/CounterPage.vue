@@ -80,8 +80,9 @@ export default {
           products.value = data.reduce((productItems, product) => {
             const items = [];
             product.variants?.forEach((variant) => {
-              if (product.modifier.name) {
+              if (product.modifier.values.length) {
                 product.modifier.values.forEach((modifier) => {
+                  // console.log(modifier);
                   items.push({
                     key: `${product._id}_${variant._id}_${modifier}`.replaceAll(' ', '-'),
                     id: variant._id,
@@ -163,6 +164,7 @@ export default {
 
   &__search {
     flex: 1;
+    font-size: 16px;
   }
 }
 

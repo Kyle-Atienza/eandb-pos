@@ -9,7 +9,7 @@ const mapProductItems = (products) => {
 };
 
 const getDisplayName = (item) => {
-  if (item.modifier?.name) {
+  if (item.modifier?.value) {
     return `${item.name} ${item.variant.name} - ${item.modifier.value}`;
   }
   return `${item.name} ${item.variant.name}`;

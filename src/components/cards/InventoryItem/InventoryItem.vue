@@ -1,31 +1,50 @@
 <template>
   <q-expansion-item
+    :ref="`inventoryItem-${data._id}`"
+    group="inventoryItems"
     header-class="item__header"
-    :class="[`inventory-item item`, isEditing ? 'item--edit' : '']"
+    :class="[`inventory-item item`, isUpdating ? 'item--edit' : '']"
     v-model="expanded"
   >
     <template v-slot:header>
       <div class="item__displayed">
         <div class="thumbnail">
-          <img :src="selectedVariant.image" alt="" />
+          <div class="thumbnail__image">
+            <div class="thumbnail__placeholder">
+              <q-icon name="image" size="lg" color="accent"></q-icon>
+            </div>
+            <img
+              :class="!selected.variant?.image ? 'thumbnail__image--empty' : ''"
+              :src="selected.variant?.image"
+              alt=""
+            />
+          </div>
+          <attribute-chip v-if="selected.variant?.amount" class="amount q-mt-sm">
+            <span style="font-size: 1.1em; white-space: nowrap">{{
+              parseAmount(selected.variant?.amount)
+            }}</span>
+          </attribute-chip>
         </div>
         <div class="details">
           <h2 class="name text-h6">{{ data.name }}</h2>
-          <!-- <attribute-chip v-if="selectedVariant.amount" class="q-mt-md">
-            <span style="font-size: 1.1em">{{ parseAmount(selectedVariant.amount) }}</span>
-          </attribute-chip> -->
-          <q-input
-            v-if="selectedVariant.amount"
-            type="number"
-            class=""
-            outlined
-            rounded
-            dense
-            v-model="amount"
-            v-on:click.stop
-            :disable="!isEditing"
-            color="primary"
-          />
+          <div class="attribute-list q-mt-sm">
+            <div class="flex">
+              <div class="attribute-list__chips">
+                <attribute-chip
+                  v-for="(variant, index) in alphanumericSort(data.variants, 'name')"
+                  :key="index"
+                  :selected="variant._id === selected.variant?._id"
+                  :update="isUpdating"
+                  type="variant"
+                  @click="selected.variant = variant"
+                  :data="variant"
+                >
+                  {{ variant.name }}
+                </attribute-chip>
+                <attribute-chip create v-if="isUpdating" type="variant" />
+              </div>
+            </div>
+          </div>
         </div>
         <div class="toggle">
           <q-btn
@@ -44,51 +63,47 @@
 
       <div class="attributes">
         <div class="attribute-list">
-          <h4 class="attribute-list__label text-subtitle1">Variants</h4>
-          <div class="flex">
-            <div class="attribute-list__chips">
-              <attribute-chip
-                v-for="(variant, index) in data.variants"
-                :key="index"
-                :selected="variant.name === selectedVariant.name"
-                @click="selectedVariant = variant"
-              >
-                {{ variant.name }}
-              </attribute-chip>
-            </div>
-          </div>
-        </div>
-
-        <div class="attribute-list">
-          <h4 class="attribute-list__label text-subtitle1">Modifiers</h4>
+          <h4
+            v-if="data.modifier.values.length || isUpdating"
+            class="attribute-list__label text-subtitle1"
+          >
+            Modifiers
+          </h4>
           <div class="attribute-list__chips">
-            <attribute-chip v-for="(variant, index) in data.modifier.values" :key="index">
-              {{ variant }}
+            <attribute-chip
+              v-for="(modifier, index) in alphanumericSort(data.modifier.values, null)"
+              :key="index"
+              :update="isUpdating"
+              @click="selected.modifier = modifier"
+              type="modifier"
+            >
+              {{ modifier }}
             </attribute-chip>
-            <attribute-chip :edit="isEditing" />
+            <attribute-chip create v-if="isUpdating" type="modifier" />
           </div>
         </div>
       </div>
 
       <div class="actions q-mt-lg">
-        <h4 class="q-my-none text-subtitle1">Actions</h4>
         <div class="flex q-gutter-sm">
           <q-btn
             class="col"
             padding="sm"
             unelevated
-            label="Edit"
+            :label="isUpdating ? 'Done' : 'Edit'"
             color="primary"
             style="font-size: 1.1em"
-            @click="isEditing = !isEditing"
+            @click="inventoryStore.toggleProductUpdate(data._id)"
           />
           <q-btn
+            v-if="!isUpdating"
             class="col"
             padding="sm"
             unelevated
             label="Delete"
             color="negative"
             style="font-size: 1.1em"
+            @click="deleteProduct"
           />
         </div>
       </div>
@@ -97,8 +112,15 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
-import { capitalizeCase, parseAmount } from 'src/helpers/utils';
+import { computed, onMounted, provide, ref, watch } from 'vue';
+
+import { alphanumericSort, capitalizeCase, parseAmount } from 'src/helpers/utils';
+import { api } from 'src/boot/axios';
+
+import { useQuasar } from 'quasar';
+
+import { useInventoryStore } from 'src/stores/inventory';
+
 import AttributeChip from './AttributeChip.vue';
 
 export default {
@@ -109,29 +131,75 @@ export default {
     data: Object,
   },
   setup({ data }) {
+    const $q = useQuasar();
+    const inventoryStore = useInventoryStore();
+
+    const inventoryItem = ref(null);
     const expanded = ref(false);
-    const selectedVariant = ref({});
-    const isEditing = ref(false);
-    const amount = ref(0);
+
+    const isUpdating = computed(
+      () => inventoryStore.updatingProduct && inventoryStore.updatingProduct._id === data._id
+    );
+    const variants = computed(
+      () => inventoryStore.products.find((product) => product._id === data._id).variants
+    );
+
+    const selected = ref({
+      product: {},
+      variant: {},
+      modifier: '',
+    });
 
     const setDefaultVariant = () => {
       const defaultVariant = data.variants[0];
-      selectedVariant.value = defaultVariant;
-      amount.value = defaultVariant.amount;
+      selected.value.variant = defaultVariant;
     };
 
     onMounted(() => {
       setDefaultVariant();
     });
 
+    watch(variants, () => setDefaultVariant());
+
+    const onAttributeClick = (callback) => {
+      selected.value.product = data;
+      callback();
+    };
+
+    const deleteProduct = () => {
+      $q.loading.show();
+      api
+        .delete(`/products/${data._id}`)
+        .then(() => {
+          inventoryStore.deleteProduct(data._id);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          $q.loading.hide();
+          expanded.value = false;
+        });
+    };
+
+    provide('selected', selected);
+    provide('isUpdating', isUpdating);
+    provide('product', data);
+
     return {
+      inventoryItem,
       expanded,
-      selectedVariant,
-      isEditing,
-      amount,
+      isUpdating,
+      variants,
+      selected,
+
+      inventoryStore,
 
       capitalizeCase,
       parseAmount,
+      onAttributeClick,
+      deleteProduct,
+      alphanumericSort,
     };
   },
 };
@@ -139,12 +207,14 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep .q-item {
-  /* pointer-events: none; */
-
   &__section {
     &--side {
       display: none;
     }
+  }
+
+  .q-focus-helper {
+    display: none;
   }
 }
 
@@ -163,7 +233,7 @@ export default {
 
   &__displayed {
     display: flex;
-    gap: 15px;
+    width: 100%;
   }
 
   &__divider {
@@ -180,20 +250,49 @@ export default {
 }
 
 .thumbnail {
-  width: 90px;
-  min-width: 90px;
-  aspect-ratio: 1/1;
+  width: 100px;
+
+  display: flex;
+  flex-direction: column;
   align-self: flex-start;
 
-  border-radius: 15px;
+  margin-right: 10px;
   overflow: hidden;
 
-  img {
+  &__image {
+    position: relative;
+
+    &--empty {
+      opacity: 0;
+    }
+  }
+
+  &__placeholder {
+    position: absolute;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 1/1;
+    background: $secondary;
+    border-radius: 15px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  img {
+    border-radius: 15px;
+
+    width: 100%;
+    aspect-ratio: 1/1;
     object-fit: cover;
     object-position: center;
+
+    position: relative;
   }
+}
+
+.amount {
+  white-space: nowrap !important;
 }
 
 .details {
@@ -207,11 +306,6 @@ export default {
   margin: 0;
 }
 
-.amount {
-  font-size: 1.1rem;
-  margin-top: 8px;
-}
-
 .toggle {
   width: 30px;
   height: 100px;
@@ -223,20 +317,15 @@ export default {
 
   &__button {
     border-radius: 15px;
-    /* flex: 1; */
     width: 100%;
   }
 }
 
 .action {
-  border-radius: 15px;
-  /* flex: 1; */
   width: 100%;
 }
 
 .attributes {
-  /* padding: 0 5px 5px 5px; */
-
   &__edit {
     border-radius: 15px;
   }

@@ -37,7 +37,7 @@ export default {
 .q-field {
   /* border: 2px solid $primary; */
   border: 2px solid $secondary;
-  border-radius: 10px;
+  border-radius: 15px;
   overflow: hidden;
 
   transition: 0.3s ease-in-out border;
@@ -48,21 +48,7 @@ export default {
   }
 
   &--dense {
-    font-size: 0.7em;
-  }
-
-  /* &--empty {
-    border: 2px solid $secondary;
-  }
-
-  &--focused {
-    border: 2px solid $primary;
-  }
-  */
-
-  ::v-deep &__control::before,
-  ::v-deep &__control::after {
-    border: none;
+    font-size: 1em;
   }
 
   ::v-deep &__label {
