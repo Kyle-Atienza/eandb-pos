@@ -33,7 +33,7 @@
                 <attribute-chip
                   v-for="(variant, index) in alphanumericSort(data.variants, 'name')"
                   :key="index"
-                  :selected="variant.name === selected.variant?.name"
+                  :selected="variant._id === selected.variant?._id"
                   :update="isUpdating"
                   type="variant"
                   @click="selected.variant = variant"
@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import { computed, onMounted, provide, ref } from 'vue';
+import { computed, onMounted, provide, ref, watch } from 'vue';
 
 import { alphanumericSort, capitalizeCase, parseAmount } from 'src/helpers/utils';
 import { api } from 'src/boot/axios';
@@ -140,6 +140,9 @@ export default {
     const isUpdating = computed(
       () => inventoryStore.updatingProduct && inventoryStore.updatingProduct._id === data._id
     );
+    const variants = computed(
+      () => inventoryStore.products.find((product) => product._id === data._id).variants
+    );
 
     const selected = ref({
       product: {},
@@ -151,6 +154,12 @@ export default {
       const defaultVariant = data.variants[0];
       selected.value.variant = defaultVariant;
     };
+
+    onMounted(() => {
+      setDefaultVariant();
+    });
+
+    watch(variants, () => setDefaultVariant());
 
     const onAttributeClick = (callback) => {
       selected.value.product = data;
@@ -173,10 +182,6 @@ export default {
         });
     };
 
-    onMounted(() => {
-      setDefaultVariant();
-    });
-
     provide('selected', selected);
     provide('isUpdating', isUpdating);
     provide('product', data);
@@ -185,6 +190,7 @@ export default {
       inventoryItem,
       expanded,
       isUpdating,
+      variants,
       selected,
 
       inventoryStore,

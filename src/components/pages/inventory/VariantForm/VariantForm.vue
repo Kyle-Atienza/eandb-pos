@@ -7,7 +7,7 @@
     </q-card-section>
     <q-card-section>
       <div class="flex column q-gutter-md">
-        <div class="variant-image">
+        <div :class="['variant-image', !variant.image ? 'variant-image--warn' : '']">
           <div class="variant-image__placeholder"><span>Add</span><span>Image</span></div>
           <img v-if="variant.image" :src="variant.image" class="variant-image__content" alt="" />
           <q-input
@@ -18,22 +18,29 @@
             "
             class="variant-image__input"
             type="file"
+            outlined
+            :rules="[(val) => !!val || '']"
           ></q-input>
         </div>
-        <outlined-text-input label="Name" placeholder="Variant Name" v-model="variant.name" />
-        <outlined-text-input label="Amount" placeholder="Variant Amount" v-model="variant.amount" />
+        <outlined-text-input
+          label="Name"
+          placeholder="Variant Name"
+          v-model="variant.name"
+          :rules="[(val) => !!val || '']"
+        />
+        <outlined-text-input
+          label="Amount"
+          placeholder="Variant Amount"
+          v-model="variant.amount"
+          :rules="[(val) => !!val || '']"
+        />
       </div>
     </q-card-section>
-    <q-card-actions align="right">
-      <q-btn
-        v-if="$attrs.create"
-        class="col"
-        unelevated
-        label="Create"
-        color="primary"
-        @click="createVariant"
-      />
-      <q-btn v-else class="col" unelevated label="Update" color="primary" @click="updateVariant" />
+    <q-card-actions v-if="$attrs.create" align="right">
+      <q-btn class="col" unelevated label="Create" color="primary" @click="createVariant" />
+    </q-card-actions>
+    <q-card-actions v-else align="right">
+      <q-btn class="col" unelevated label="Update" color="primary" @click="updateVariant" />
       <q-btn class="col" unelevated label="Delete" color="negative" @click="deleteVariant" />
     </q-card-actions>
   </q-card>
@@ -51,6 +58,7 @@ import { computed, inject, onMounted, ref, watch } from 'vue';
 import { api } from 'src/boot/axios';
 import { imageToBase64 } from 'src/helpers/image';
 import { useQuasar } from 'quasar';
+import { checkEmptyObjectValues, mapEmptyFieldErrorMessage } from 'src/helpers/utils';
 
 export default {
   components: {
@@ -60,17 +68,19 @@ export default {
   props: {
     update: Boolean,
   },
-  emits: ['close'],
+  emits: ['close', 'create'],
   setup(props, { attrs, emit }) {
     const $q = useQuasar();
     const inventoryStore = useInventoryStore();
 
     const alert = ref(null);
-    const variant = ref({});
+    const variant = ref({
+      image: '',
+      name: '',
+      amount: '',
+    });
     const selected = inject('selected');
     const product = inject('product');
-
-    // const isUpdating = inject('isUpdating');
 
     const products = computed(() => inventoryStore.products);
     const isUpdating = computed(
@@ -110,36 +120,51 @@ export default {
     });
 
     const onUpdate = (request) => {
-      $q.loading.show();
-      request()
-        .then((res) => {
-          const otherProducts = products.value.filter(
-            (item) => item._id !== inventoryStore.updatingProduct._id
-          );
+      const emptyValues = checkEmptyObjectValues(variant.value, ['image']);
 
-          inventoryStore.setProducts([
-            ...otherProducts,
-            {
-              ...res.data,
-              updating: true,
+      if (emptyValues.length) {
+        alert.value.open('Product Error', mapEmptyFieldErrorMessage(emptyValues), [
+          {
+            label: 'OK',
+            action: () => {
+              alert.value.close();
             },
-          ]);
+          },
+        ]);
+      } else {
+        $q.loading.show();
+        request()
+          .then((res) => {
+            const otherProducts = products.value.filter(
+              (item) => item._id !== inventoryStore.updatingProduct._id
+            );
 
-          emit('close');
-        })
-        .catch((err) => {
-          alert.value.open('Variant Error', err.response.data.error.message, [
-            {
-              label: 'OK',
-              action: () => {
-                alert.value.close();
+            inventoryStore.setProducts([
+              ...otherProducts,
+              {
+                ...res.data,
+                updating: true,
               },
-            },
-          ]);
-        })
-        .finally(() => {
-          $q.loading.hide();
-        });
+            ]);
+
+            emit('create');
+            emit('close');
+          })
+          .catch((err) => {
+            console.log(err);
+            alert.value.open('Variant Error', err.response ?? err.response.data.error.message, [
+              {
+                label: 'OK',
+                action: () => {
+                  alert.value.close();
+                },
+              },
+            ]);
+          })
+          .finally(() => {
+            $q.loading.hide();
+          });
+      }
     };
 
     const updateVariant = () => {
@@ -185,6 +210,7 @@ export default {
   border-radius: 15px;
   display: grid;
   padding: 8px;
+  position: relative;
 
   & > * {
     grid-row: 1/1;
@@ -205,7 +231,28 @@ export default {
   }
 
   &__input {
-    opacity: 0;
+    ::v-deep .q-field__control {
+      height: 100%;
+      border-radius: 10px !important;
+    }
+
+    ::v-deep .q-field__control-container {
+      max-width: 0 !important;
+    }
+
+    ::v-deep .q-field__append {
+      padding: 0;
+      position: absolute;
+      left: 100%;
+      height: 100%;
+      transform: translateX(50%);
+    }
+  }
+
+  &__input-validation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

@@ -82,3 +82,21 @@ body {
     color: $dark;
   }
 }
+
+.q-field {
+  &--with-bottom {
+    padding: 0;
+  }
+  &__bottom {
+    display: none;
+  }
+
+  &--outlined .q-field__control{
+    border-radius: 13px;
+  }
+
+  /* &__control::before,
+  &__control::after {
+    border-radius: 13px !important;
+  } */
+}

@@ -21,7 +21,12 @@
     </span>
   </q-btn>
   <q-dialog persistent v-model="dialog">
-    <variant-form v-if="type === 'variant'" @close="dialog = false" v-bind="$props" />
+    <variant-form
+      v-if="type === 'variant'"
+      @close="dialog = false"
+      v-bind="$props"
+      @create="$emit('create')"
+    />
     <modifier-form v-if="type === 'modifier'" @close="dialog = false" v-bind="$props" />
   </q-dialog>
 </template>
