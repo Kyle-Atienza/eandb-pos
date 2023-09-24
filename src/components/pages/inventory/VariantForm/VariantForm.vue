@@ -172,7 +172,8 @@ export default {
     };
 
     const deleteVariant = () => {
-      onUpdate(() => api(variantRequest(otherVariants.value)));
+      const payload = [...otherVariants.value, { ...variant.value, isDeleted: true }];
+      onUpdate(() => api(variantRequest(payload)));
     };
 
     const createVariant = () => {

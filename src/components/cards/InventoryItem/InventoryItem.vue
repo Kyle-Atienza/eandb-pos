@@ -31,7 +31,7 @@
             <div class="flex">
               <div class="attribute-list__chips">
                 <attribute-chip
-                  v-for="(variant, index) in alphanumericSort(data.variants, 'name')"
+                  v-for="(variant, index) in alphanumericSort(variants, 'name')"
                   :key="index"
                   :selected="variant._id === selected.variant?._id"
                   :update="isUpdating"
@@ -140,10 +140,14 @@ export default {
     const isUpdating = computed(
       () => inventoryStore.updatingProduct && inventoryStore.updatingProduct._id === data._id
     );
-    const variants = computed(
-      () => inventoryStore.products.find((product) => product._id === data._id).variants
-    );
+    const variants = computed(() => {
+      const output = inventoryStore.products
+        .find((product) => product._id === data._id)
+        .variants.filter((variant) => !variant.isDeleted);
 
+      return output;
+    });
+    const params = computed(() => new URLSearchParams(`id=${data._id}`));
     const selected = ref({
       product: {},
       variant: {},
@@ -151,7 +155,7 @@ export default {
     });
 
     const setDefaultVariant = () => {
-      const defaultVariant = data.variants[0];
+      const defaultVariant = variants.value[0];
       selected.value.variant = defaultVariant;
     };
 
@@ -168,10 +172,17 @@ export default {
 
     const deleteProduct = () => {
       $q.loading.show();
-      api
-        .delete(`/products/${data._id}`)
-        .then(() => {
-          inventoryStore.deleteProduct(data._id);
+      api({
+        url: '/products/',
+        method: 'put',
+        params: params.value,
+        data: {
+          ...data,
+          isDeleted: true,
+        },
+      })
+        .then((res) => {
+          inventoryStore.deleteProduct(res.data._id);
         })
         .catch((err) => {
           console.log(err);
