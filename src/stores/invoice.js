@@ -12,13 +12,7 @@ export const useInvoiceStore = defineStore('invoice', {
     items: [],
   }),
   getters: {
-    /* getTotal(state) {
-      return state.items.reduce((amount, item) => {
-        const itemAmount = amount + item.quantity * item.variant.amount;
-        amount = itemAmount;
-        return amount;
-      }, 0);
-    }, */
+    selectedProductVariants() {},
     isEmpty(state) {
       return !state.items.length;
     },
@@ -35,7 +29,7 @@ export const useInvoiceStore = defineStore('invoice', {
       this.items.push(product);
     },
     removeItem(key) {
-      this.items = this.items.filter((item) => item.key !== key);
+      this.items = this.items.filter(({ item }) => item !== key);
     },
     updateItem(key, updatedData) {
       const productIndex = this.items.map((item) => item.key).indexOf(key);
@@ -49,6 +43,20 @@ export const useInvoiceStore = defineStore('invoice', {
     },
     updateDetails(key, value) {
       this.details[key] = value;
+    },
+    getQuantity(id) {
+      // find all items with the id provided
+      const products = this.items.filter(({ item }) => {
+        const itemId = item.split('_')[0];
+        return itemId === id;
+      });
+
+      const quantity = products.reduce((total, product) => {
+        total += product.quantity;
+        return total;
+      }, 0);
+
+      return quantity;
     },
     async create() {
       return api.post('/invoices', {

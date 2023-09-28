@@ -16,15 +16,7 @@
     </header-layout>
     <page-wrapper>
       <div class="q-mx-md">
-        <div v-if="loading" class="products products--loading">
-          <product-card
-            v-for="(product, index) in 6"
-            :key="index"
-            :data="product"
-            skeleton
-          />
-        </div>
-        <div v-else class="products">
+        <div class="products">
           <product-card
             v-for="(product, index) in products"
             :key="index"
@@ -40,12 +32,13 @@
 <script>
 import { onMounted, reactive, ref, watch } from 'vue';
 
-import ProductCard from 'src/components/cards/ProductCard/ProductCard.vue';
+import ProductCard from 'src/components/cards/CounterItem/ProductCard.vue';
 import FilterProducts from 'src/components/pages/counter/FilterProducts/FilterProducts.vue';
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 import HeaderLayout from 'src/components/common/Header/HeaderLayout.vue';
 import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
 import { api } from 'src/boot/axios';
+import { useQuasar } from 'quasar';
 
 export default {
   components: {
@@ -57,16 +50,17 @@ export default {
     OutlinedTextInput,
   },
   setup() {
+    const $q = useQuasar();
+
     const search = ref('');
     let filter = reactive({
       brand: [],
     });
 
     const products = ref([]);
-    const loading = ref(false);
 
     const fetchProducts = () => {
-      loading.value = true;
+      $q.loading.show();
       api({
         url: '/products',
         params: {
@@ -77,7 +71,7 @@ export default {
         .then((res) => {
           const { data } = res.data;
 
-          products.value = data.reduce((productItems, product) => {
+          /* products.value = data.reduce((productItems, product) => {
             const items = [];
             product.variants?.forEach((variant) => {
               if (product.modifier.values.length) {
@@ -110,15 +104,15 @@ export default {
 
             productItems.push(...items);
             return productItems;
-          }, []);
+          }, []); */
 
-          // products.value = data;
+          products.value = data;
         })
         .catch((err) => {
           console.log(err);
         })
         .finally(() => {
-          loading.value = false;
+          $q.loading.hide();
         });
     };
 
@@ -138,7 +132,6 @@ export default {
       filter,
 
       products,
-      loading,
 
       setFilter,
     };
