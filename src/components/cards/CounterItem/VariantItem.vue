@@ -5,33 +5,48 @@
     @click="$emit('pick', data)"
   >
     <div :class="['variant-item', 'full-width', selected ? 'variant-item--selected' : '']">
-      <div class="variant-item__details full-width">
-        <div class="variant-item__detail variant-image">
-          <img :src="data.variant.image" alt="" />
-        </div>
-        <div class="variant-item__detail variant-detail">
-          <div class="variant-detail__section">
-            <q-chip
-              :color="selected ? 'dark' : 'primary'"
-              text-color="secondary"
-              :label="data.variant.name"
-            />
-            <p class="text-h5">{{ data.variant.amount }}</p>
+      <div class="variant-item__details full-width flex column">
+        <div class="flex q-gutter-sm">
+          <div class="variant-item__detail variant-image">
+            <img :src="data.variant.image" alt="" />
           </div>
-          <!-- <div class="variant-detail__section variant-detail--inventory">
-                <div class="inventory-count">
-                  <p class="text-subtitle2">24</p>
-                  <q-icon name="inventory_2" size="xs"></q-icon>
-                </div>
-              </div> -->
+          <div class="variant-item__detail variant-detail">
+            <div class="variant-detail__section">
+              <q-chip
+                :color="selected ? 'dark' : 'primary'"
+                text-color="secondary"
+                :label="data.variant.name"
+              />
+              <p class="text-h5">{{ data.variant.amount }}</p>
+            </div>
+          </div>
+        </div>
+        <div v-if="selected && product.modifier.values.length" class="select-modifier">
+          <select-input
+            class="select-modifier__select"
+            required
+            v-model="modifier"
+            :items="product.modifier.values"
+            :label="product.modifier.name ? capitalizeCase(product.modifier.name) : 'Modifier'"
+            color="secondary"
+            label-color="secondary"
+            dense
+            :rules="[(val) => !!val || '']"
+          >
+          </select-input>
         </div>
       </div>
+
       <slot name="quantity" v-bind="$props"></slot>
     </div>
   </button-wrapper>
 </template>
 
 <script>
+import { capitalizeCase } from 'src/helpers/utils';
+
+import SelectInput from 'src/components/forms/SelectInput/SelectInput.vue';
+import { inject, ref } from 'vue';
 import ButtonWrapper from '../ButtonWrapper/ButtonWrapper.vue';
 
 export default {
@@ -43,9 +58,20 @@ export default {
   },
   components: {
     ButtonWrapper,
+    SelectInput,
   },
   setup(props) {
+    const product = inject('product');
+    const modifier = ref('');
+
     console.log(props.variant);
+
+    return {
+      product,
+      modifier,
+
+      capitalizeCase,
+    };
   },
 };
 </script>
@@ -59,8 +85,6 @@ export default {
   position: relative;
 
   &__details {
-    display: flex;
-    gap: 15px;
     padding: 10px;
   }
 
@@ -93,23 +117,13 @@ export default {
   }
 }
 
-.inventory-count {
-  color: $dark;
+.select-modifier {
+  margin-top: 10px;
 
-  background: $secondary;
-  border-radius: 10px;
-  border: $accent 4px solid;
-  padding: 5px;
-  width: 40px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  p {
-    margin: 0;
-    line-height: 0.9em;
+  &__select {
+    background: $dark;
+    border-radius: 13px;
+    overflow: hidden;
   }
 }
 

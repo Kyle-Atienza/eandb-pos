@@ -76,14 +76,15 @@ q, span, h1, h2, h3, h4, h5, h6 {
   }
 
   .q-field__control-container {
-    padding-top: 40px !important;
+    padding-top: 30px !important;
+    padding-bottom: 4px;
   }
 
   .q-field__label {
-    background: $secondary;
+    background: $dark;
     padding: 0.2em 0.5em;
     border-radius: 999px;
-    top: 24px;
+    top: 18px;
     color: $dark;
   }
 }

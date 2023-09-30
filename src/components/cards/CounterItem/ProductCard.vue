@@ -13,7 +13,7 @@
       <p class="q-mt-xs q-mb-none">{{ data.name }}</p>
     </div>
     <div class="actions">
-      <product-quantity v-bind="$props" />
+      <product-quantity v-bind="$props" @select-variant="variantSelect.open()" />
       <q-btn
         v-if="quantity"
         @click="onRemoveItem"
@@ -23,14 +23,18 @@
       />
     </div>
   </div>
+
+  <variant-select ref="variantSelect" />
 </template>
 
 <script>
 import { parseAmount } from 'src/helpers/utils';
-import { computed, provide } from 'vue';
+import { computed, provide, ref } from 'vue';
 import { useInvoiceStore } from 'src/stores/invoice';
 import { getDisplayName } from 'src/helpers/products';
+
 import ProductQuantity from './ProductQuantity.vue';
+import VariantSelect from './VariantSelect.vue';
 
 export default {
   props: {
@@ -38,9 +42,12 @@ export default {
   },
   components: {
     ProductQuantity,
+    VariantSelect,
   },
   setup({ data }) {
     const invoiceStore = useInvoiceStore();
+
+    const variantSelect = ref(null);
 
     const quantity = computed(() => invoiceStore.getQuantity(data._id));
     const name = computed(() => {
@@ -61,6 +68,8 @@ export default {
 
     return {
       parseAmount,
+
+      variantSelect,
 
       name,
       quantity,

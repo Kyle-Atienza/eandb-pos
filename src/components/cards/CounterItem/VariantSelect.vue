@@ -1,10 +1,4 @@
 <template>
-  <q-btn class="q-mx-md full-width" unelevated color="primary" size="md" @click="dialog = true">
-    <span class="flex items-center justify-between full-width q-px-sm">
-      Add Variant
-      <q-icon name="add" size="xs" />
-    </span>
-  </q-btn>
   <q-dialog persistent v-model="dialog" class="q-px-md">
     <q-card>
       <q-card-section class="row">
@@ -38,7 +32,7 @@
 </template>
 
 <script>
-import { computed, inject, onMounted, ref } from 'vue';
+import { computed, inject, onMounted, onUpdated, ref } from 'vue';
 
 import VariantItem from './VariantItem.vue';
 
@@ -50,7 +44,7 @@ export default {
     VariantItem,
   },
   setup() {
-    const dialog = ref(true);
+    const dialog = ref(false);
     const selected = ref({});
 
     const product = inject('product');
@@ -68,12 +62,26 @@ export default {
 
     onMounted(() => {});
 
+    onUpdated(() => {
+      if (!dialog.value) {
+        selected.value = {};
+      }
+    });
+
     const onSelectVariant = () => {};
 
     const isSelected = (id) => {
       const output = Object.keys(selected.value).length && selected.value.variant._id === id;
 
       return output;
+    };
+
+    const open = () => {
+      dialog.value = true;
+    };
+
+    const close = () => {
+      dialog.value = false;
     };
 
     return {
@@ -84,6 +92,9 @@ export default {
 
       onSelectVariant,
       isSelected,
+
+      open,
+      close,
     };
   },
 };
