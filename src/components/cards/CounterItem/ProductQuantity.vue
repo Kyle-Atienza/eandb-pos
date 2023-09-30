@@ -17,31 +17,32 @@
         </div>
       </q-card-section>
 
-      <q-card-section>
+      <q-card-section v-if="productItems.length">
         <variant-quantity
-          v-for="(item, index) in defaultItems"
+          class="product-item"
+          v-for="(item, index) in productItems"
           :key="index"
           :data="item"
           quantity
         />
+        <q-btn class="q-mt-md full-width" unelevated color="primary" size="md">
+          <span class="flex items-center justify-between full-width">
+            Add Variant
+            <q-icon name="add" size="xs" />
+          </span>
+        </q-btn>
       </q-card-section>
 
       <q-card-actions>
         <!-- if there is only one variant no need to display select variant -->
         <!-- <variant-selection v-if="product.variants.length > 1 || true" /> -->
-        <q-btn class="q-mx-md full-width" unelevated color="primary" size="md">
-          <span class="flex items-center justify-between full-width q-px-sm">
-            Add Variant
-            <q-icon name="add" size="xs" />
-          </span>
-        </q-btn>
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <script>
-import { inject, onMounted, ref } from 'vue';
+import { computed, inject, onMounted, ref } from 'vue';
 import { useInvoiceStore } from 'src/stores/invoice';
 
 // import VariantSelection from './VariantSelect.vue';
@@ -57,12 +58,14 @@ export default {
     VariantQuantity,
   },
   setup(props, { emit }) {
+    const product = inject('product');
+
     const invoiceStore = useInvoiceStore();
 
     const dialog = ref(false);
     const defaultItems = ref([]);
 
-    const product = inject('product');
+    const productItems = computed(() => invoiceStore.productItems(product._id));
 
     onMounted(() => {
       if (product.variants.length === 1) {
@@ -76,28 +79,22 @@ export default {
     });
 
     const onAddProduct = () => {
-      // check if product only has 1 variant
-
       if (product.modifier.values.length || product.variants.length > 1) {
         emit('select-variant');
       } else {
-        dialog.value = true;
-      }
+        const item = {
+          item: `${product._id}_${product.variants[0]._id}`,
+          name: product.name,
+          variant: product.variants[0],
+          quantity: 1,
+        };
 
-      if (false) {
-        if (product.variants.length === 1 && product.modifier.values.length === 0) {
-          const item = {
-            item: `${product._id}_${product.variants[0]._id}`,
-            name: product.name,
-            variant: product.variants[0],
-            quantity: 1,
-          };
-
-          invoiceStore.addItem(item);
-        } else {
-          dialog.value = true;
-        }
+        invoiceStore.addItem(item);
       }
+    };
+
+    const open = () => {
+      dialog.value = true;
     };
 
     return {
@@ -105,7 +102,10 @@ export default {
       dialog,
       defaultItems,
 
+      productItems,
+
       onAddProduct,
+      open,
     };
   },
 };
@@ -138,6 +138,12 @@ export default {
 
   &__name {
     flex: 1;
+  }
+}
+
+.product-item {
+  &:not(:first-child) {
+    margin-top: 15px;
   }
 }
 </style>

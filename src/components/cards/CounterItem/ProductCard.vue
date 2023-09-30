@@ -13,14 +13,26 @@
       <p class="q-mt-xs q-mb-none">{{ data.name }}</p>
     </div>
     <div class="actions">
-      <product-quantity v-bind="$props" @select-variant="variantSelect.open()" />
+      <product-quantity
+        ref="productQuantity"
+        v-bind="$props"
+        @select-variant="variantSelect.open()"
+      />
       <q-btn
-        v-if="quantity"
+        v-if="quantity && !hasSelect"
         @click="onRemoveItem"
         icon="remove"
         flat
-        class="action action--remove"
+        class="action action--right action--remove"
       />
+      <q-btn
+        v-if="quantity && hasSelect"
+        @click="productQuantity.open()"
+        flat
+        class="action action--right action--edit"
+      >
+        <q-icon name="edit" size="xs"></q-icon>
+      </q-btn>
     </div>
   </div>
 
@@ -48,8 +60,10 @@ export default {
     const invoiceStore = useInvoiceStore();
 
     const variantSelect = ref(null);
+    const productQuantity = ref(null);
 
     const quantity = computed(() => invoiceStore.getQuantity(data._id));
+    const hasSelect = computed(() => data.modifier.values.length || data.variants.length > 1);
     const name = computed(() => {
       if (data.variants.length === 1) {
         const variant = data.variants[0].name;
@@ -70,8 +84,10 @@ export default {
       parseAmount,
 
       variantSelect,
+      productQuantity,
 
       name,
+      hasSelect,
       quantity,
 
       getDisplayName,
@@ -202,7 +218,7 @@ $gap: 8px;
     flex: 3;
   } */
 
-  &--remove {
+  &--right {
     background: #f27979;
     flex: 2;
   }

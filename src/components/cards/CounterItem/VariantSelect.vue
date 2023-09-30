@@ -16,8 +16,10 @@
           option
         />
       </q-card-section>
+
       <q-card-actions>
         <q-btn
+          :disable="!'item' in selected"
           class="q-mx-md full-width"
           unelevated
           color="primary"
@@ -32,7 +34,8 @@
 </template>
 
 <script>
-import { computed, inject, onMounted, onUpdated, ref } from 'vue';
+import { computed, inject, onMounted, onUpdated, provide, ref } from 'vue';
+import { useInvoiceStore } from 'src/stores/invoice';
 
 import VariantItem from './VariantItem.vue';
 
@@ -44,10 +47,25 @@ export default {
     VariantItem,
   },
   setup() {
+    const invoiceStore = useInvoiceStore();
+
+    const product = inject('product');
+
     const dialog = ref(false);
     const selected = ref({});
 
-    const product = inject('product');
+    const isValidItem = computed(() => {
+      const conditions = [];
+
+      if (product.modifier.values.length) {
+        conditions.push(!!selected.value.modifier);
+      }
+
+      conditions.push('item' in selected.value);
+
+      console.log(conditions);
+      return conditions.every((condition) => !!condition);
+    });
 
     const variants = computed(() => {
       const output = product.variants.map((variant) => ({
@@ -59,7 +77,6 @@ export default {
 
       return output;
     });
-
     onMounted(() => {});
 
     onUpdated(() => {
@@ -68,7 +85,14 @@ export default {
       }
     });
 
-    const onSelectVariant = () => {};
+    const onSelectVariant = () => {
+      if (isValidItem.value) {
+        invoiceStore.addItem({
+          ...selected.value,
+          quantity: 1,
+        });
+      }
+    };
 
     const isSelected = (id) => {
       const output = Object.keys(selected.value).length && selected.value.variant._id === id;
@@ -84,11 +108,14 @@ export default {
       dialog.value = false;
     };
 
+    provide('selected', selected);
+
     return {
       product,
       dialog,
       selected,
       variants,
+      isValidItem,
 
       onSelectVariant,
       isSelected,

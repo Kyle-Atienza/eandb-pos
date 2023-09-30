@@ -41,6 +41,14 @@ export const useInvoiceStore = defineStore('invoice', {
     findItem(key) {
       return this.items.find((item) => item.key === key);
     },
+    productItems(id) {
+      const items = this.items.filter(({ item }) => {
+        const itemId = item.split('_')[0];
+        return itemId === id;
+      });
+
+      return items;
+    },
     updateDetails(key, value) {
       this.details[key] = value;
     },
@@ -55,6 +63,11 @@ export const useInvoiceStore = defineStore('invoice', {
         total += product.quantity;
         return total;
       }, 0);
+
+      return quantity || 0;
+    },
+    getItemQuantity(key) {
+      const { quantity } = this.items.find(({ item }) => item === key);
 
       return quantity;
     },

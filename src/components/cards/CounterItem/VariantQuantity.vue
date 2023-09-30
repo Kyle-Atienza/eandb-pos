@@ -1,9 +1,9 @@
 <template>
-  <variant-item>
+  <variant-item v-bind="$props">
     <template #quantity>
       <div class="variant-quantity">
         <div class="variant-quantity__value value">
-          <p class="q-mb-none">0</p>
+          <p class="q-mb-none">{{ quantity }}</p>
         </div>
         <div class="variant-quantity__actions actions">
           <q-btn class="action action--add" icon="add" unelevated />
@@ -15,14 +15,30 @@
 </template>
 
 <script>
+import { useInvoiceStore } from 'src/stores/invoice';
+
+import { computed, onMounted } from 'vue';
 import VariantItem from './VariantItem.vue';
 
 export default {
   components: {
     VariantItem,
   },
-  setup() {
-    return {};
+  props: {
+    data: Object,
+  },
+  setup(props) {
+    const invoiceStore = useInvoiceStore();
+
+    const quantity = computed(() => invoiceStore.getItemQuantity(props.data.item));
+
+    onMounted(() => {
+      console.log();
+    });
+
+    return {
+      quantity,
+    };
   },
 };
 </script>

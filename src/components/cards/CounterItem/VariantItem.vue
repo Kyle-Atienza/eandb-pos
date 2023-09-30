@@ -31,13 +31,19 @@
             color="secondary"
             label-color="secondary"
             dense
+            @update:model-value="
+              $emit('pick', {
+                ...data,
+                modifier: modifier,
+              })
+            "
             :rules="[(val) => !!val || '']"
           >
           </select-input>
         </div>
       </div>
 
-      <slot name="quantity" v-bind="$props"></slot>
+      <slot name="quantity"></slot>
     </div>
   </button-wrapper>
 </template>
@@ -60,11 +66,9 @@ export default {
     ButtonWrapper,
     SelectInput,
   },
-  setup(props) {
+  setup() {
     const product = inject('product');
     const modifier = ref('');
-
-    console.log(props.variant);
 
     return {
       product,

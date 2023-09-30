@@ -24,13 +24,11 @@ export default {
     color: String,
   },
   emits: ['pick'],
-  setup(props, { emit, attrs }) {
+  setup(props, { emit }) {
     const selected = ref('');
 
     onUpdated(() => {
       emit('pick', selected.value);
-
-      console.log(attrs);
     });
 
     return {
@@ -45,11 +43,6 @@ export default {
   ::v-deep .q-field__control::before {
     border: 0 !important;
   }
-
-  &--bordered {
-  }
-
-  /* 2px solid currentColor */
 }
 
 .q-field--dense {
