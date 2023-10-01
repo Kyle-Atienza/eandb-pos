@@ -6,13 +6,13 @@
   >
     <div :class="['variant-item', 'full-width', selected ? 'variant-item--selected' : '']">
       <div class="variant-item__details full-width flex column">
-        <div class="flex q-gutter-sm">
+        <div class="variant-detail__wrapper full-width">
           <div class="variant-item__detail variant-image">
             <img :src="data.variant.image" alt="" />
           </div>
           <div class="variant-item__detail variant-detail">
-            <div class="variant-detail__section">
-              <div class="variant-section--chips">
+            <div class="variant-detail__section full-width">
+              <div class="variant-section--chips full-width">
                 <q-chip
                   class="variant-detail__modifier"
                   :color="selected ? 'dark' : 'primary'"
@@ -21,7 +21,7 @@
                 />
                 <q-chip
                   v-if="data.modifier"
-                  class="variant-detail__name self-start"
+                  class="variant-detail__name self-start ellipsis"
                   color="secondary"
                   text-color="dark"
                   :label="data.modifier"
@@ -123,6 +123,12 @@ export default {
 .variant-detail {
   flex: 1;
   display: flex;
+  overflow: hidden;
+
+  &__wrapper {
+    display: flex;
+    gap: 12px;
+  }
 
   &__section {
     display: flex;
@@ -167,6 +173,8 @@ export default {
   height: $dimensions;
   border-radius: 10px;
   overflow: hidden;
+
+  flex-shrink: 0;
 
   display: flex;
 

@@ -7,9 +7,10 @@
       <img v-if="data.variants?.length" :src="data.variants[0].image" alt="" />
     </div>
     <div class="card__name">
-      <q-chip v-if="data.variants.length === 1" color="primary" text-color="secondary">{{
-        data.variants[0].name
-      }}</q-chip>
+      <q-chip color="primary" text-color="secondary">
+        <span v-if="data.variants.length === 1">{{ data.variants[0].name }}</span>
+        <q-icon v-else name="shelves" color="secondary" />
+      </q-chip>
       <p class="q-mt-xs q-mb-none">{{ data.name }}</p>
     </div>
     <product-quantity
@@ -17,29 +18,6 @@
       v-bind="$props"
       @select-variant="variantSelect.open()"
     />
-    <!-- <div class="actions">
-      <product-quantity
-        ref="productQuantity"
-        v-bind="$props"
-        @select-variant="variantSelect.open()"
-      />
-      <q-btn
-        v-if="quantity && !hasSelect"
-        @click="onRemoveItem"
-        icon="remove"
-        flat
-        class="action action--right action--remove"
-      />
-      <q-btn
-        v-if="quantity && hasSelect"
-        @click="productQuantity.open()"
-        flat
-        class="action action--right action--edit"
-      >
-        <q-icon name="edit" size="xs"></q-icon>
-      </q-btn>
-
-    </div> -->
   </div>
 
   <variant-select ref="variantSelect" @selected="productQuantity.open()" />
