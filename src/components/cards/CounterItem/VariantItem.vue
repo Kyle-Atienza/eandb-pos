@@ -12,15 +12,26 @@
           </div>
           <div class="variant-item__detail variant-detail">
             <div class="variant-detail__section">
-              <q-chip
-                :color="selected ? 'dark' : 'primary'"
-                text-color="secondary"
-                :label="data.variant.name"
-              />
-              <p class="text-h5">{{ data.variant.amount }}</p>
+              <div class="variant-section--chips">
+                <q-chip
+                  class="variant-detail__modifier"
+                  :color="selected ? 'dark' : 'primary'"
+                  text-color="secondary"
+                  :label="data.variant.name"
+                />
+                <q-chip
+                  v-if="data.modifier"
+                  class="variant-detail__name self-start"
+                  color="secondary"
+                  text-color="dark"
+                  :label="data.modifier"
+                />
+              </div>
+              <p class="variant-details__amount text-h5 q-ma-none">{{ data.variant.amount }}</p>
             </div>
           </div>
         </div>
+
         <div v-if="selected && product.modifier.values.length" class="select-modifier">
           <select-input
             class="select-modifier__select"
@@ -34,6 +45,7 @@
             @update:model-value="
               $emit('pick', {
                 ...data,
+                item: `${data.item}_${modifier}`,
                 modifier: modifier,
               })
             "
@@ -82,18 +94,25 @@ export default {
 
 <style lang="scss" scoped>
 .variant-item {
-  background: darken($dark, 5);
-  border-radius: 15px;
   display: flex;
-  overflow: hidden;
   position: relative;
 
   &__details {
+    background: darken($dark, 5);
+
+    border-radius: 15px;
+    overflow: hidden;
+
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   &--selected {
-    background: $primary;
+    .variant-item__details {
+      background: $primary;
+    }
   }
 
   &__wrapper:disabled {
@@ -109,6 +128,10 @@ export default {
     display: flex;
     align-items: flex-start;
 
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
     &:first-child {
       flex: 1;
       flex-direction: column;
@@ -121,9 +144,15 @@ export default {
   }
 }
 
-.select-modifier {
-  margin-top: 10px;
+.variant-section {
+  &--chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
 
+.select-modifier {
   &__select {
     background: $dark;
     border-radius: 13px;

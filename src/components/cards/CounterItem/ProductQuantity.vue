@@ -34,7 +34,7 @@
         </div>
       </q-card-section>
 
-      <q-card-section v-if="productItems.length">
+      <q-card-section>
         <variant-quantity
           class="product-item"
           v-for="(item, index) in productItems"
@@ -42,7 +42,13 @@
           :data="item"
           quantity
         />
-        <q-btn class="q-mt-md full-width" unelevated color="primary" size="md">
+        <q-btn
+          class="q-mt-md full-width"
+          unelevated
+          color="primary"
+          size="md"
+          @click="$emit('select-variant')"
+        >
           <span class="flex items-center justify-between full-width">
             Add Variant
             <q-icon name="add" size="xs" />

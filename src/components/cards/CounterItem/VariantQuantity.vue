@@ -1,13 +1,26 @@
 <template>
   <variant-item v-bind="$props">
     <template #quantity>
-      <div class="variant-quantity">
-        <div class="variant-quantity__value value">
+      <div class="variant-quantity bg-dark-page">
+        <!-- <div class="variant-quantity__value value">
           <p class="q-mb-none">{{ quantity }}</p>
-        </div>
+        </div> -->
         <div class="variant-quantity__actions actions">
-          <q-btn class="action action--add" icon="add" unelevated />
-          <q-btn class="action action--remove" icon="remove" unelevated />
+          <q-btn
+            class="action action--add"
+            icon="add"
+            unelevated
+            @click="invoiceStore.setItemQuantity(data.item, 1)"
+          />
+          <div class="variant-quantity__value value">
+            <p class="q-mb-none">{{ quantity }}</p>
+          </div>
+          <q-btn
+            class="action action--remove"
+            icon="remove"
+            unelevated
+            @click="invoiceStore.setItemQuantity(data.item, -1)"
+          />
         </div>
       </div>
     </template>
@@ -35,6 +48,8 @@ export default {
     onMounted(() => {});
 
     return {
+      invoiceStore,
+
       quantity,
     };
   },
@@ -46,18 +61,18 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 120px;
+  /* border-radius: 15px; */
+  /* overflow: hidden; */
+
+  border-left: 15px solid $dark;
 
   &__value {
-    min-width: 40px;
-    height: 50px;
-    border: 2px solid $secondary;
-    border-radius: 99px;
+    padding: 10px 5px;
 
-    background: $dark;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    p {
+      font-size: 1.2em;
+    }
   }
 }
 
@@ -66,6 +81,10 @@ export default {
 
   display: flex;
   flex-direction: column;
+  border-radius: 15px;
+  overflow: hidden;
+
+  background: darken($dark, 5);
 }
 
 .action {
