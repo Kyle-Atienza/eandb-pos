@@ -77,9 +77,13 @@ export const useInvoiceStore = defineStore('invoice', {
 
       return quantity;
     },
-    setItemQuantity(key, quantity) {
+    setItemQuantity(key, addQuantity, replaceQuantity = 0) {
       const itemIndex = this.items.map(({ item }) => item).indexOf(key);
-      const newQuantity = this.items[itemIndex].quantity + quantity;
+      let newQuantity = this.items[itemIndex].quantity + addQuantity;
+
+      if (!addQuantity) {
+        newQuantity = replaceQuantity;
+      }
 
       this.items[itemIndex] = {
         ...this.items[itemIndex],
