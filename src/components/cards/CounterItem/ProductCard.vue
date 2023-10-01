@@ -12,7 +12,12 @@
       }}</q-chip>
       <p class="q-mt-xs q-mb-none">{{ data.name }}</p>
     </div>
-    <div class="actions">
+    <product-quantity
+      ref="productQuantity"
+      v-bind="$props"
+      @select-variant="variantSelect.open()"
+    />
+    <!-- <div class="actions">
       <product-quantity
         ref="productQuantity"
         v-bind="$props"
@@ -33,10 +38,11 @@
       >
         <q-icon name="edit" size="xs"></q-icon>
       </q-btn>
-    </div>
+
+    </div> -->
   </div>
 
-  <variant-select ref="variantSelect" />
+  <variant-select ref="variantSelect" @selected="productQuantity.open()" />
 </template>
 
 <script>

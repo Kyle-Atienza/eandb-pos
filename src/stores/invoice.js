@@ -67,9 +67,29 @@ export const useInvoiceStore = defineStore('invoice', {
       return quantity || 0;
     },
     getItemQuantity(key) {
+      const findItem = this.items.find(({ item }) => item === key);
+
+      if (!findItem) {
+        return 0;
+      }
+
       const { quantity } = this.items.find(({ item }) => item === key);
 
       return quantity;
+    },
+    setItemQuantity(key, quantity) {
+      const itemIndex = this.items.map(({ item }) => item).indexOf(key);
+      console.log(itemIndex);
+      const newQuantity = this.items[itemIndex].quantity + quantity;
+
+      this.items[itemIndex] = {
+        ...this.items[itemIndex],
+        quantity: newQuantity,
+      };
+
+      if (!newQuantity) {
+        this.items.splice(itemIndex, 1);
+      }
     },
     async create() {
       return api.post('/invoices', {

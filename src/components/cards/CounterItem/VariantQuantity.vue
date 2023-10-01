@@ -32,9 +32,7 @@ export default {
 
     const quantity = computed(() => invoiceStore.getItemQuantity(props.data.item));
 
-    onMounted(() => {
-      console.log();
-    });
+    onMounted(() => {});
 
     return {
       quantity,

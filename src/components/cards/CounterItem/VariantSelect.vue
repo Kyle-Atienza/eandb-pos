@@ -46,7 +46,8 @@ export default {
   components: {
     VariantItem,
   },
-  setup() {
+  emits: ['selected'],
+  setup(_, { emit }) {
     const invoiceStore = useInvoiceStore();
 
     const product = inject('product');
@@ -63,7 +64,6 @@ export default {
 
       conditions.push('item' in selected.value);
 
-      console.log(conditions);
       return conditions.every((condition) => !!condition);
     });
 
@@ -86,12 +86,16 @@ export default {
     });
 
     const onSelectVariant = () => {
-      if (isValidItem.value) {
+      if (invoiceStore.getItemQuantity(selected.value.item)) {
+        invoiceStore.setItemQuantity(selected.value.item, 1);
+      } else if (isValidItem.value) {
         invoiceStore.addItem({
           ...selected.value,
           quantity: 1,
         });
       }
+      dialog.value = false;
+      emit('selected');
     };
 
     const isSelected = (id) => {

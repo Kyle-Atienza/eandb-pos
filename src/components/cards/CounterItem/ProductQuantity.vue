@@ -1,5 +1,22 @@
 <template>
-  <q-btn icon="add" @click="onAddProduct" unelevated color="primary" class="add full-width" />
+  <div class="actions">
+    <q-btn icon="add" @click="onAddQuantity" unelevated color="primary" class="add full-width" />
+    <q-btn
+      v-if="quantity && !hasSelect"
+      icon="remove"
+      flat
+      class="action action--right action--remove"
+      @click="onRemoveQuantity"
+    />
+    <q-btn
+      v-if="quantity && hasSelect"
+      flat
+      class="action action--right action--edit"
+      @click="dialog = true"
+    >
+      <q-icon name="edit" size="xs"></q-icon>
+    </q-btn>
+  </div>
 
   <q-dialog persistent full-height v-model="dialog">
     <q-card>
@@ -32,11 +49,6 @@
           </span>
         </q-btn>
       </q-card-section>
-
-      <q-card-actions>
-        <!-- if there is only one variant no need to display select variant -->
-        <!-- <variant-selection v-if="product.variants.length > 1 || true" /> -->
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
@@ -45,7 +57,6 @@
 import { computed, inject, onMounted, ref } from 'vue';
 import { useInvoiceStore } from 'src/stores/invoice';
 
-// import VariantSelection from './VariantSelect.vue';
 import VariantQuantity from './VariantQuantity.vue';
 
 export default {
@@ -54,7 +65,6 @@ export default {
   },
   emits: ['select-variant'],
   components: {
-    // VariantSelection,
     VariantQuantity,
   },
   setup(props, { emit }) {
@@ -66,6 +76,9 @@ export default {
     const defaultItems = ref([]);
 
     const productItems = computed(() => invoiceStore.productItems(product._id));
+    const quantity = computed(() => invoiceStore.getQuantity(product._id));
+    const hasSelect = computed(() => product.modifier.values.length || product.variants.length > 1);
+    const singleItemKey = computed(() => `${product._id}_${product.variants[0]._id}`);
 
     onMounted(() => {
       if (product.variants.length === 1) {
@@ -78,12 +91,14 @@ export default {
       }
     });
 
-    const onAddProduct = () => {
+    const onAddQuantity = () => {
       if (product.modifier.values.length || product.variants.length > 1) {
         emit('select-variant');
+      } else if (invoiceStore.getItemQuantity(singleItemKey.value)) {
+        invoiceStore.setItemQuantity(singleItemKey.value, 1);
       } else {
         const item = {
-          item: `${product._id}_${product.variants[0]._id}`,
+          item: singleItemKey.value,
           name: product.name,
           variant: product.variants[0],
           quantity: 1,
@@ -91,6 +106,10 @@ export default {
 
         invoiceStore.addItem(item);
       }
+    };
+
+    const onRemoveQuantity = () => {
+      invoiceStore.setItemQuantity(singleItemKey.value, -1);
     };
 
     const open = () => {
@@ -103,8 +122,11 @@ export default {
       defaultItems,
 
       productItems,
+      quantity,
+      hasSelect,
 
-      onAddProduct,
+      onAddQuantity,
+      onRemoveQuantity,
       open,
     };
   },
@@ -112,6 +134,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.actions {
+  flex: 2;
+  display: flex;
+  border-radius: 15px;
+  overflow: hidden;
+
+  height: 80px;
+}
+
+.action {
+  border-radius: 0;
+  width: 100%;
+
+  /* &--add {
+    background: #00bc89;
+    flex: 3;
+  } */
+
+  &--right {
+    background: #f27979;
+    flex: 2;
+  }
+}
+
 .add {
   border-radius: 0;
 }
