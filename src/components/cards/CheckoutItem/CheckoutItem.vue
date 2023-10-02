@@ -22,6 +22,7 @@
       dense
       v-model="quantity"
       color="primary"
+      @blur="onReplaceQuantity"
     />
     <div class="total text-h6">{{ parseAmount(data.variant.amount * data.quantity) }}</div>
     <!-- <div class="amount">
@@ -34,34 +35,31 @@ import { parseAmount } from 'src/helpers/utils';
 import { useInvoiceStore } from 'src/stores/invoice';
 import { getDisplayName } from 'src/helpers/products';
 
-import { onMounted, ref, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 
 export default {
   props: {
     data: Object,
   },
-  setup({ data }) {
-    const invoice = useInvoiceStore();
+  setup(props) {
+    const invoiceStore = useInvoiceStore();
 
     const quantity = ref(0);
 
     onMounted(() => {
-      quantity.value = data.quantity;
+      quantity.value = invoiceStore.getItemQuantity(props.data.item);
     });
 
-    watch(quantity, () => {
-      invoice.updateItem(data.key, {
-        ...data,
-        quantity: Number(quantity.value) ? Number(quantity.value) : 1,
-      });
+    const onReplaceQuantity = () => {
+      quantity.value = quantity.value || 1;
 
-      if (!Number(quantity.value)) {
-        quantity.value = 1;
-      }
-    });
+      invoiceStore.setItemQuantity(props.data.item, 0, parseFloat(quantity.value));
+    };
 
     return {
       quantity,
+
+      onReplaceQuantity,
 
       parseAmount,
       getDisplayName,

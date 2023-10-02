@@ -1,5 +1,12 @@
 <template>
-  <q-btn class="counter-fab" @click="action($route.path)" fab icon="point_of_sale" color="primary">
+  <q-btn
+    v-if="!hiddenPath.includes($route.path)"
+    class="counter-fab"
+    @click="action($route.path)"
+    fab
+    icon="point_of_sale"
+    color="primary"
+  >
     <q-badge v-if="invoice.items.length" color="accent" text-color="dark" floating>{{
       invoice.items.length
     }}</q-badge>
@@ -23,7 +30,7 @@ export default {
 
     const router = useRouter();
 
-    const hiddenPath = ['/checkout/items', '/checkout/details'];
+    const hiddenPath = ['/checkout/items', '/checkout/details', '/'];
 
     const popupRef = ref(null);
 

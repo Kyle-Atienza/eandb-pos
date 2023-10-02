@@ -15,4 +15,8 @@ const getDisplayName = (item) => {
   return `${item.name} ${item.variant.name}`;
 };
 
-export { mapProductItems, getDisplayName };
+const hasMultipleVariants = (product) => product.variants.length > 1;
+
+const getItemKey = () => {};
+
+export { mapProductItems, getDisplayName, hasMultipleVariants, getItemKey };

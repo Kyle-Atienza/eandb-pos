@@ -4,73 +4,78 @@
       <div v-if="quantity" class="card__counter">
         {{ quantity }}
       </div>
-      <q-skeleton v-if="skeleton" height="100%" />
-      <img v-else :src="data.image" alt="" />
+      <img v-if="data.variants?.length" :src="data.variants[0].image" alt="" />
     </div>
-    <q-skeleton v-if="skeleton" class="card__name card__name--skeleton" type="text" />
-    <h3 v-else class="card__name">{{ getDisplayName(data) }}</h3>
-    <div v-if="data.amount" class="amount">{{ parseAmount(data?.amount) }}</div>
-    <div class="actions">
-      <q-btn @click="quantity += 1" icon="add" flat class="action action--add" />
-      <q-btn
-        v-if="quantity"
-        @click="quantity -= 1"
-        icon="remove"
-        flat
-        class="action action--remove"
-      />
+    <div class="card__name">
+      <q-chip color="primary" text-color="secondary">
+        <span v-if="data.variants.length === 1">{{ data.variants[0].name }}</span>
+        <q-icon v-else name="shelves" color="secondary" />
+      </q-chip>
+      <p class="q-mt-xs q-mb-none">{{ data.name }}</p>
     </div>
+    <product-quantity
+      ref="productQuantity"
+      v-bind="$props"
+      @select-variant="variantSelect.open()"
+    />
   </div>
+
+  <variant-select ref="variantSelect" @selected="productQuantity.open()" />
 </template>
 
 <script>
 import { parseAmount } from 'src/helpers/utils';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, provide, ref } from 'vue';
 import { useInvoiceStore } from 'src/stores/invoice';
 import { getDisplayName } from 'src/helpers/products';
+
+import ProductQuantity from './ProductQuantity.vue';
+import VariantSelect from './VariantSelect.vue';
 
 export default {
   props: {
     data: Object,
-    skeleton: {
-      type: Boolean,
-      default: false,
-    },
   },
-  setup({ data, skeleton }) {
-    const invoice = useInvoiceStore();
+  components: {
+    ProductQuantity,
+    VariantSelect,
+  },
+  setup({ data }) {
+    const invoiceStore = useInvoiceStore();
 
-    const quantity = ref(0);
+    const variantSelect = ref(null);
+    const productQuantity = ref(null);
 
-    onMounted(() => {
-      if (!skeleton) {
-        quantity.value = invoice.findItem(data.key)?.quantity || 0;
+    const quantity = computed(() => invoiceStore.getQuantity(data._id));
+    const hasSelect = computed(() => data.modifier.values.length || data.variants.length > 1);
+    const name = computed(() => {
+      if (data.variants.length === 1) {
+        const variant = data.variants[0].name;
+        return `${data.name} - ${variant}`;
       }
+      return data.name;
     });
 
-    const invoiceItem = computed(() => ({
-      ...data,
-      quantity,
-    }));
+    const onRemoveItem = () => {
+      const key = `${data._id}_${data.variants[0]._id}`;
 
-    watch(quantity, () => {
-      if (quantity.value) {
-        if (!invoice.hasItem(data.key)) {
-          invoice.addItem(invoiceItem.value);
-        } else {
-          invoice.updateItem(data.key, invoiceItem.value);
-        }
-      } else {
-        invoice.removeItem(data.key);
-      }
-    });
+      invoiceStore.removeItem(key);
+    };
+
+    provide('product', data);
 
     return {
       parseAmount,
 
+      variantSelect,
+      productQuantity,
+
+      name,
+      hasSelect,
       quantity,
 
       getDisplayName,
+      onRemoveItem,
     };
   },
 };
@@ -192,12 +197,12 @@ $gap: 8px;
   border-radius: 0;
   width: 100%;
 
-  &--add {
+  /* &--add {
     background: #00bc89;
     flex: 3;
-  }
+  } */
 
-  &--remove {
+  &--right {
     background: #f27979;
     flex: 2;
   }
