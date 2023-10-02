@@ -1,19 +1,22 @@
 <template>
   <div>
-    <variant-item v-bind="$props">
+    <variant-item v-bind="{ ...$props, ...$attrs }" :name="invoice">
       <template #quantity>
         <div class="variant-quantity bg-dark-page">
-          <div class="variant-quantity__actions actions">
+          <div class="variant-quantity__actions actions flex column justify-center">
             <q-btn
+              v-if="!record"
               class="action action--add"
               icon="add"
               unelevated
               @click="invoiceStore.setItemQuantity(data.item, 1)"
             />
-            <div class="variant-quantity__value value">
-              <p class="q-mb-none">{{ quantity }}</p>
+            <div class="variant-quantity__value value full-width">
+              <p v-if="record" class="q-mb-none text-h6">{{ quantity }}</p>
+              <p v-else class="q-mb-none">{{ quantity }}</p>
             </div>
             <q-btn
+              v-if="!record"
               class="action action--remove"
               icon="remove"
               unelevated
@@ -42,13 +45,19 @@ export default {
   },
   props: {
     data: Object,
+    invoice: Boolean,
   },
   setup(props) {
     const invoiceStore = useInvoiceStore();
 
     const alertPopup = ref(null);
 
-    const quantity = computed(() => invoiceStore.getItemQuantity(props.data.item));
+    const quantity = computed(() => {
+      if (props.record) {
+        return props.data.quantity;
+      }
+      return invoiceStore.getItemQuantity(props.data.item);
+    });
 
     const onRemoveQuantity = () => {
       if (quantity.value === 1) {
@@ -93,13 +102,15 @@ export default {
   /* border-radius: 15px; */
   /* overflow: hidden; */
 
-  border-left: 15px solid $dark;
+  /* border-left: 15px solid $dark; */
+  margin-left: 15px;
 
   &__value {
     padding: 10px 5px;
+    min-width: 50px;
 
     p {
-      font-size: 1.2em;
+      /* font-size: 1.2em; */
     }
   }
 }

@@ -5,7 +5,13 @@
       <checkout-item v-for="(item, key) in invoice.items" :key="key" :data="item" />
     </div>
     <div class="items--inner q-px-md">
-      <variant-quantity class="item" v-for="(item, key) in invoice.items" :key="key" :data="item" />
+      <variant-quantity
+        class="item"
+        v-for="(item, key) in invoice.items"
+        :key="key"
+        :data="item"
+        invoice
+      />
     </div>
   </div>
 </template>
@@ -21,6 +27,9 @@ export default {
   components: {
     CheckoutItem,
     VariantQuantity,
+  },
+  props: {
+    history: Boolean,
   },
   setup() {
     const invoice = computed(() => {

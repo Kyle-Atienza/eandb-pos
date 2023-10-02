@@ -6,11 +6,16 @@
   >
     <div :class="['variant-item', 'full-width', selected ? 'variant-item--selected' : '']">
       <div class="variant-item__details full-width flex column">
-        <div class="variant-detail__wrapper full-width">
-          <div class="variant-item__detail variant-image">
+        <div v-if="name" class="variant-detail variant-detail--name">
+          <p class="text-subtitle1 q-ma-none text-left">
+            {{ data.name }}
+          </p>
+        </div>
+        <div class="variant-detail variant-detail--flex full-width">
+          <div class="variant-image">
             <img :src="data.variant.image" alt="" />
           </div>
-          <div class="variant-item__detail variant-detail">
+          <div class="">
             <div class="variant-detail__section full-width">
               <div class="variant-section--chips full-width">
                 <q-chip
@@ -26,13 +31,6 @@
                   text-color="dark"
                   :label="data.modifier"
                 />
-                <!-- <q-chip
-                  class="variant-detail__modifier block"
-                  :color="selected ? 'dark' : 'primary'"
-                  text-color="secondary"
-                  :label="parseAmount(data.variant.amount)"
-                  size="lg"
-                /> -->
               </div>
               <p class="variant-details__amount text-h6 q-ma-none">
                 {{ parseAmount(data.variant.amount) }}
@@ -83,6 +81,7 @@ export default {
     selected: Boolean,
     option: Boolean,
     quantity: Boolean,
+    name: Boolean,
   },
   components: {
     ButtonWrapper,
@@ -114,10 +113,9 @@ export default {
     border-radius: 15px;
     overflow: hidden;
 
-    padding: 10px;
-    display: flex;
+    /* display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 10px; */
   }
 
   &--selected {
@@ -132,11 +130,30 @@ export default {
 }
 
 .variant-detail {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
+  padding: 10px;
 
-  &__wrapper {
+  &--name {
+    /* background: $secondary;
+    color: $dark; */
+
+    p {
+      line-height: 1.1em;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 1px;
+        background: $secondary;
+      }
+    }
+  }
+
+  &--flex {
     display: flex;
     gap: 12px;
   }

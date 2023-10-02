@@ -95,19 +95,27 @@ export const useInvoiceStore = defineStore('invoice', {
       }
     },
     async create() {
+      /* let { items } = this;
+      items = this.items.map((item) => {
+        const invoiceItem = item;
+
+        delete invoiceItem.variant;
+        delete invoiceItem.name;
+
+        return invoiceItem;
+      }); */
+
       return api.post('/invoices', {
         buyer: this.buyer,
         contactNumber: this.contactNumber,
         emailAddress: this.emailAddress,
         notes: this.notes,
         paymentMethod: this.paymentMethod,
+        total: getTotal(this.items),
         items: this.items.map((item) => ({
-          id: item._id,
-          item: item.key,
-          variant: item.variant._id,
+          item: item.item,
           quantity: item.quantity,
         })),
-        total: getTotal(this.items),
       });
     },
     reset() {
