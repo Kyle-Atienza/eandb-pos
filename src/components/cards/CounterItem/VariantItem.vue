@@ -26,8 +26,17 @@
                   text-color="dark"
                   :label="data.modifier"
                 />
+                <!-- <q-chip
+                  class="variant-detail__modifier block"
+                  :color="selected ? 'dark' : 'primary'"
+                  text-color="secondary"
+                  :label="parseAmount(data.variant.amount)"
+                  size="lg"
+                /> -->
               </div>
-              <p class="variant-details__amount text-h5 q-ma-none">{{ data.variant.amount }}</p>
+              <p class="variant-details__amount text-h6 q-ma-none">
+                {{ parseAmount(data.variant.amount) }}
+              </p>
             </div>
           </div>
         </div>
@@ -61,10 +70,11 @@
 </template>
 
 <script>
-import { capitalizeCase } from 'src/helpers/utils';
+import { capitalizeCase, parseAmount } from 'src/helpers/utils';
 
 import SelectInput from 'src/components/forms/SelectInput/SelectInput.vue';
 import { inject, ref } from 'vue';
+
 import ButtonWrapper from '../ButtonWrapper/ButtonWrapper.vue';
 
 export default {
@@ -85,6 +95,7 @@ export default {
     return {
       product,
       modifier,
+      parseAmount,
 
       capitalizeCase,
     };
@@ -136,7 +147,7 @@ export default {
 
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    /* gap: 5px; */
 
     &:first-child {
       flex: 1;
@@ -154,7 +165,7 @@ export default {
   &--chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 5px;
   }
 }
 

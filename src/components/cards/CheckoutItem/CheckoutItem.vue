@@ -35,7 +35,7 @@ import { parseAmount } from 'src/helpers/utils';
 import { useInvoiceStore } from 'src/stores/invoice';
 import { getDisplayName } from 'src/helpers/products';
 
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 
 export default {
   props: {
@@ -55,19 +55,6 @@ export default {
 
       invoiceStore.setItemQuantity(props.data.item, 0, parseFloat(quantity.value));
     };
-
-    watch(quantity, () => {
-      if (false) {
-        invoiceStore.updateItem(props.data.key, {
-          ...props.data,
-          quantity: Number(quantity.value) ? Number(quantity.value) : 1,
-        });
-
-        if (!Number(quantity.value)) {
-          quantity.value = 1;
-        }
-      }
-    });
 
     return {
       quantity,

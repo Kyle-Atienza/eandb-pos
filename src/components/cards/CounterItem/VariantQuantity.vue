@@ -1,41 +1,44 @@
 <template>
-  <variant-item v-bind="$props">
-    <template #quantity>
-      <div class="variant-quantity bg-dark-page">
-        <!-- <div class="variant-quantity__value value">
-          <p class="q-mb-none">{{ quantity }}</p>
-        </div> -->
-        <div class="variant-quantity__actions actions">
-          <q-btn
-            class="action action--add"
-            icon="add"
-            unelevated
-            @click="invoiceStore.setItemQuantity(data.item, 1)"
-          />
-          <div class="variant-quantity__value value">
-            <p class="q-mb-none">{{ quantity }}</p>
+  <div>
+    <variant-item v-bind="$props">
+      <template #quantity>
+        <div class="variant-quantity bg-dark-page">
+          <div class="variant-quantity__actions actions">
+            <q-btn
+              class="action action--add"
+              icon="add"
+              unelevated
+              @click="invoiceStore.setItemQuantity(data.item, 1)"
+            />
+            <div class="variant-quantity__value value">
+              <p class="q-mb-none">{{ quantity }}</p>
+            </div>
+            <q-btn
+              class="action action--remove"
+              icon="remove"
+              unelevated
+              @click="onRemoveQuantity"
+            />
           </div>
-          <q-btn
-            class="action action--remove"
-            icon="remove"
-            unelevated
-            @click="invoiceStore.setItemQuantity(data.item, -1)"
-          />
         </div>
-      </div>
-    </template>
-  </variant-item>
+      </template>
+    </variant-item>
+    <alert-popup ref="alertPopup" />
+  </div>
 </template>
 
 <script>
 import { useInvoiceStore } from 'src/stores/invoice';
 
-import { computed, onMounted } from 'vue';
+import { computed, ref } from 'vue';
+
+import AlertPopup from 'src/components/common/AlertPopup/AlertPopup.vue';
 import VariantItem from './VariantItem.vue';
 
 export default {
   components: {
     VariantItem,
+    AlertPopup,
   },
   props: {
     data: Object,
@@ -43,14 +46,39 @@ export default {
   setup(props) {
     const invoiceStore = useInvoiceStore();
 
+    const alertPopup = ref(null);
+
     const quantity = computed(() => invoiceStore.getItemQuantity(props.data.item));
 
-    onMounted(() => {});
+    const onRemoveQuantity = () => {
+      if (quantity.value === 1) {
+        alertPopup.value.open('Remove Item', 'Are you sure you want to remove this item?', [
+          {
+            label: 'Yes',
+            action: () => {
+              invoiceStore.setItemQuantity(props.data.item, -1);
+            },
+          },
+          {
+            label: 'Cancel',
+            action: () => {
+              alertPopup.value.close();
+            },
+          },
+        ]);
+      } else {
+        invoiceStore.setItemQuantity(props.data.item, -1);
+      }
+    };
 
     return {
       invoiceStore,
 
+      alertPopup,
+
       quantity,
+
+      onRemoveQuantity,
     };
   },
 };

@@ -19,7 +19,7 @@
 
       <q-card-actions>
         <q-btn
-          :disable="!'item' in selected"
+          :disable="!'item' in selected || !isValidItem"
           class="q-mx-md full-width"
           unelevated
           color="primary"
