@@ -46,6 +46,7 @@ export default {
   props: {
     data: Object,
     invoice: Boolean,
+    record: Boolean,
   },
   setup(props) {
     const invoiceStore = useInvoiceStore();
@@ -53,7 +54,7 @@ export default {
     const alertPopup = ref(null);
 
     const quantity = computed(() => {
-      if (props.record) {
+      if (props.invoice) {
         return props.data.quantity;
       }
       return invoiceStore.getItemQuantity(props.data.item);

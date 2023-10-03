@@ -15,7 +15,7 @@
           <div class="variant-image">
             <img :src="data.variant.image" alt="" />
           </div>
-          <div class="">
+          <div class="variant-info">
             <div class="variant-detail__section full-width">
               <div class="variant-section--chips full-width">
                 <q-chip
@@ -103,6 +103,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$spacing: 10px;
+
 .variant-item {
   display: flex;
   position: relative;
@@ -130,7 +132,7 @@ export default {
 }
 
 .variant-detail {
-  padding: 10px;
+  padding: $spacing;
 
   &--name {
     /* background: $secondary;
@@ -143,7 +145,7 @@ export default {
       &::after {
         content: '';
         position: absolute;
-        bottom: -10px;
+        bottom: -$spacing;
         left: 50%;
         transform: translate(-50%, -50%);
         width: 100%;
@@ -187,6 +189,8 @@ export default {
 }
 
 .select-modifier {
+  padding: 0 $spacing $spacing;
+
   &__select {
     background: $dark;
     border-radius: 13px;
@@ -199,7 +203,7 @@ export default {
 
   width: $dimensions;
   height: $dimensions;
-  border-radius: 10px;
+  border-radius: $spacing;
   overflow: hidden;
 
   flex-shrink: 0;
@@ -212,5 +216,9 @@ export default {
     object-fit: cover;
     object-position: center;
   }
+}
+
+.variant-info {
+  overflow: hidden;
 }
 </style>

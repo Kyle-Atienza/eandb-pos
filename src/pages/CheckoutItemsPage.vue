@@ -11,6 +11,7 @@
         :key="key"
         :data="item"
         invoice
+        :record="history"
       />
     </div>
   </div>
