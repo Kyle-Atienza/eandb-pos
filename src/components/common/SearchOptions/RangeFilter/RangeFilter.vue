@@ -86,7 +86,6 @@ export default {
     const to = computed(() => (dateRange.value.to ? transformDate(dateRange.value.to) : ''));
 
     watch([min, max, from, to], () => {
-      console.log('update');
       emit('update');
     });
 
