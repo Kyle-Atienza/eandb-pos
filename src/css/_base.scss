@@ -52,6 +52,10 @@ q, span, h1, h2, h3, h4, h5, h6 {
 .q-btn {
   text-transform: none;
   border-radius: 15px;
+
+  &--outline::before {
+    border: 2px solid currentColor;
+  }
 }
 
 .q-chip {

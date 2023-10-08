@@ -9,7 +9,7 @@
             color="secondary"
             text-color="dark"
           />
-          <q-chip :label="itemsCount" color="secondary" text-color="dark" />
+          <q-chip :label="`${data.items.length} items`" color="secondary" text-color="dark" />
         </div>
       </div>
       <div class="item__amount">
