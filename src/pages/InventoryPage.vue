@@ -45,7 +45,7 @@ export default {
       inventoryItems.value = [];
     });
 
-    onMounted(() => {
+    const fetchProducts = () => {
       $q.loading.show();
       api
         .get('/products')
@@ -60,6 +60,12 @@ export default {
         .finally(() => {
           $q.loading.hide();
         });
+    };
+
+    onMounted(() => {
+      if (!products.value.length) {
+        fetchProducts();
+      }
     });
     return { products, alphanumericSort };
   },
