@@ -2,16 +2,27 @@
 <template>
   <q-page>
     <header-layout label="Counter">
-      <div class="header q-mt-sm">
-        <outlined-text-input
-          dense
-          class="header__search"
-          placeholder="Search Products"
-          icon="search"
-          v-model="search"
-          indicator
+      <div class="row q-pt-md  full-width">
+        <div class="col row flex bg-secondary search-bar">
+          <outlined-text-input
+            dense
+            class="col-grow bg-primary"
+            label="Product Name"
+            placeholder="Juan Dela Cruz"
+            v-model="buyer"
+          />
+          <q-btn class="filter bg-secondary" @click="onSearch" round color="secondary" outline>
+            <q-icon name="search" color="primary" />
+          </q-btn>
+        </div>
+        <q-btn
+          class="filter q-ml-md"
+          @click="dialog = !dialog"
+          round
+          color="secondary"
+          outline
+          icon="filter_list"
         />
-        <filter-products @on-filter="setFilter" class="header__filter" />
       </div>
     </header-layout>
     <page-wrapper>
@@ -33,24 +44,29 @@
 import { onMounted, reactive, ref, watch } from 'vue';
 
 import ProductCard from 'src/components/cards/CounterItem/ProductCard.vue';
-import FilterProducts from 'src/components/pages/counter/FilterProducts/FilterProducts.vue';
+// import FilterProducts from 'src/components/pages/counter/FilterProducts/FilterProducts.vue';
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 import HeaderLayout from 'src/components/common/Header/HeaderLayout.vue';
 import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
+
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
+
+import { useInventoryStore } from 'src/stores/inventory';
 
 export default {
   components: {
     PageWrapper,
     ProductCard,
     HeaderLayout,
-    FilterProducts,
+    // FilterProducts,
 
     OutlinedTextInput,
   },
   setup() {
     const $q = useQuasar();
+
+    const inventoryStore = useInventoryStore();
 
     const search = ref('');
     let filter = reactive({
@@ -70,41 +86,6 @@ export default {
       })
         .then((res) => {
           const { data } = res.data;
-
-          /* products.value = data.reduce((productItems, product) => {
-            const items = [];
-            product.variants?.forEach((variant) => {
-              if (product.modifier.values.length) {
-                product.modifier.values.forEach((modifier) => {
-                  // console.log(modifier);
-                  items.push({
-                    key: `${product._id}_${variant._id}_${modifier}`.replaceAll(' ', '-'),
-                    id: variant._id,
-                    name: product.name,
-                    brand: product.brand,
-                    image: variant.image,
-                    variant,
-                    modifier: {
-                      name: product.modifier.name,
-                      value: modifier,
-                    },
-                  });
-                });
-              } else {
-                items.push({
-                  key: `${product._id}_${variant._id}`.replaceAll(' ', '-'),
-                  id: variant._id,
-                  name: product.name,
-                  brand: product.brand,
-                  image: variant.image,
-                  variant,
-                });
-              }
-            });
-
-            productItems.push(...items);
-            return productItems;
-          }, []); */
 
           products.value = data;
         })
@@ -128,6 +109,8 @@ export default {
     });
 
     return {
+      inventoryStore,
+
       search,
       filter,
 
@@ -140,25 +123,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-
-  :deep(.filter) {
-    aspect-ratio: 1/1;
-    font-size: 0.6rem;
-    height: min-content;
-
-    &::before {
-      border: 2px solid currentColor;
-    }
-  }
-
-  &__search {
-    flex: 1;
-    font-size: 16px;
-  }
+.search-bar {
+  border-radius: 15px;
 }
 
 .products {
