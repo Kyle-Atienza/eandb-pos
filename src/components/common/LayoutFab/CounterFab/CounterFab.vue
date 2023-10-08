@@ -1,14 +1,14 @@
 <template>
   <q-btn
-    v-if="!hiddenPath.includes($route.path)"
+    v-if="invoiceStore.items.length"
     class="counter-fab"
-    @click="action($route.path)"
+    to="/checkout/items"
     fab
-    icon="point_of_sale"
+    icon="receipt_long"
     color="primary"
   >
-    <q-badge v-if="invoice.items.length" color="accent" text-color="dark" floating>{{
-      invoice.items.length
+    <q-badge v-if="invoiceStore.items.length" color="accent" text-color="dark" floating>{{
+      invoiceStore.items.length
     }}</q-badge>
   </q-btn>
 
@@ -26,17 +26,15 @@ export default {
     AlertPopup,
   },
   setup() {
-    const invoice = useInvoiceStore();
-
+    const invoiceStore = useInvoiceStore();
     const router = useRouter();
-
     const hiddenPath = ['/checkout/items', '/checkout/details', '/'];
 
     const popupRef = ref(null);
 
     const action = (path) => {
       if (path === '/counter') {
-        if (invoice.isEmpty) {
+        if (invoiceStore.isEmpty) {
           popupRef.value.open('Empty Items', 'Please select at least one item to checkout.', [
             {
               label: 'OK',
@@ -54,7 +52,7 @@ export default {
     };
 
     return {
-      invoice,
+      invoiceStore,
 
       hiddenPath,
       popupRef,
