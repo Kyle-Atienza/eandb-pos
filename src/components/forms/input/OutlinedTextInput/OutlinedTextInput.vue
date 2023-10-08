@@ -31,7 +31,7 @@ export default {
 }
 
 .q-input {
-  font-size: 1.2rem;
+  font-size: 18px;
 }
 
 .q-field {
@@ -48,7 +48,7 @@ export default {
   }
 
   &--dense {
-    font-size: 1em;
+    font-size: 14px;
   }
 
   ::v-deep &__label {

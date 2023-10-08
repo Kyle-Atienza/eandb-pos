@@ -4,7 +4,6 @@
       <div class="row full-width">
         <div class="col row flex bg-secondary search-bar">
           <outlined-text-input
-            dense
             class="col-grow bg-primary"
             label="Buyer Name"
             placeholder="Juan Dela Cruz"
@@ -26,7 +25,7 @@
       <q-dialog persistent v-model="dialog">
         <q-card>
           <q-card-section class="row">
-            <div class="text-h6 col">Select Variants</div>
+            <div class="text-h6 col">Filter Records</div>
             <q-btn
               icon="close"
               round
