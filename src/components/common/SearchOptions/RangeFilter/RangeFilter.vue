@@ -22,8 +22,18 @@
     <q-card>
       <q-card-section class="">
         <div v-if="date" class="row q-gutter-md items-center">
-          <outlined-text-input class="col" label="From" placeholder="1" v-model="from" />
-          <outlined-text-input class="col" label="To" placeholder="20" v-model="to" />
+          <outlined-text-input
+            class="col no-pointer-events"
+            label="From"
+            placeholder="1"
+            v-model="from"
+          />
+          <outlined-text-input
+            class="col no-pointer-events"
+            label="To"
+            placeholder="20"
+            v-model="to"
+          />
           <q-btn v-if="date" class="self-stretch bg-primary" icon="calendar_month" unelevated flat>
             <q-menu>
               <div class="bg-dark">
@@ -55,7 +65,7 @@
 </template>
 
 <script>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 
@@ -63,12 +73,13 @@ export default {
   components: {
     OutlinedTextInput,
   },
-  emits: ['update'],
+  emits: ['update', 'update:modelValue'],
   props: {
     label: String,
     date: Boolean,
+    modelValue: Object,
   },
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const min = ref();
     const max = ref();
     const dateRange = ref({ from: null, to: null });
@@ -86,7 +97,30 @@ export default {
     const to = computed(() => (dateRange.value.to ? transformDate(dateRange.value.to) : ''));
 
     watch([min, max, from, to], () => {
-      emit('update');
+      let updatedValue = {};
+      if (props.date) {
+        updatedValue = {
+          from: dateRange.value.from,
+          to: dateRange.value.to,
+        };
+      } else {
+        updatedValue = {
+          min: min.value,
+          max: max.value,
+        };
+      }
+      emit('update:modelValue', updatedValue);
+    });
+
+    onMounted(() => {
+      // TODO: implement modelvalue to each range
+      if (props.date) {
+        dateRange.value.from = props.modelValue.from;
+        dateRange.value.to = props.modelValue.to;
+      } else {
+        min.value = props.modelValue.min;
+        max.value = props.modelValue.max;
+      }
     });
 
     const reset = () => {
