@@ -2,13 +2,7 @@
   <header-layout label="Dashboard" root />
   <q-page>
     <page-wrapper>
-      <q-btn
-        @click="$router.push('checkout/items')"
-        class="q-mx-md"
-        unelevated
-        color="primary"
-        size="lg"
-      >
+      <q-btn to="/counter" class="q-mx-md" unelevated color="primary" size="lg">
         <span class="flex items-center justify-between full-width">
           New Order
           <q-icon name="add" size="sm" />

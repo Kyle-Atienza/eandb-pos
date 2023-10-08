@@ -20,19 +20,9 @@
         v-model="navbarTabs"
         class="bg-primary text-white"
       >
-        <q-tab @click="$router.push('/')" name="dashboard" icon="dashboard" label="Dashboard" />
-        <q-tab
-          @click="$router.push('/history/list')"
-          name="history"
-          icon="list_alt"
-          label="History"
-        />
-        <q-tab
-          @click="$router.push('/inventory')"
-          name="inventory"
-          icon="inventory_2"
-          label="Inventory"
-        />
+        <q-route-tab to="/" name="dashboard" icon="dashboard" label="Dashboard" />
+        <q-route-tab to="/history/list" name="history" icon="list_alt" label="Records" />
+        <q-route-tab to="/inventory" name="inventory" icon="inventory_2" label="Inventory" />
       </q-tabs>
     </q-footer>
   </q-layout>
