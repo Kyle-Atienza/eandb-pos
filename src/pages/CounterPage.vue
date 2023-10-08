@@ -27,13 +27,13 @@
     </header-layout>
     <page-wrapper>
       <div class="q-mx-md">
-        <div class="products">
+        <q-pull-to-refresh class="products" @refresh="fetchProducts">
           <product-card
-            v-for="(product, index) in products"
+            v-for="(product, index) in inventoryStore.products"
             :key="index"
             :data="product"
           />
-        </div>
+        </q-pull-to-refresh>
       </div>
     </page-wrapper>
     <router-view></router-view>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 import ProductCard from 'src/components/cards/CounterItem/ProductCard.vue';
 // import FilterProducts from 'src/components/pages/counter/FilterProducts/FilterProducts.vue';
@@ -73,9 +73,9 @@ export default {
       brand: [],
     });
 
-    const products = ref([]);
+    const products = computed(() => inventoryStore.products);
 
-    const fetchProducts = () => {
+    const fetchProducts = (done) => {
       $q.loading.show();
       api({
         url: '/products',
@@ -87,13 +87,14 @@ export default {
         .then((res) => {
           const { data } = res.data;
 
-          products.value = data;
+          inventoryStore.setProducts(data);
         })
         .catch((err) => {
           console.log(err);
         })
         .finally(() => {
           $q.loading.hide();
+          if (done) done();
         });
     };
 
@@ -105,7 +106,9 @@ export default {
     watch(search, () => fetchProducts());
 
     onMounted(() => {
-      fetchProducts();
+      if (!products.value.length) {
+        fetchProducts();
+      }
     });
 
     return {
@@ -117,6 +120,7 @@ export default {
       products,
 
       setFilter,
+      fetchProducts,
     };
   },
 };
@@ -128,13 +132,15 @@ export default {
 }
 
 .products {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  padding-bottom: 80px;
+  ::v-deep .q-pull-to-refresh__content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding-bottom: 80px;
+  }
 }
 
-@media screen and (min-width: $breakpoint-sm-min) {
+/* @media screen and (min-width: $breakpoint-sm-min) {
   .products {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -144,5 +150,5 @@ export default {
   .products {
     grid-template-columns: repeat(4, 1fr);
   }
-}
+} */
 </style>
