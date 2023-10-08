@@ -62,7 +62,11 @@
       </q-dialog>
     <page-wrapper>
       <div class="q-mx-md">
-        <q-pull-to-refresh class="products" @refresh="fetchProducts">
+        <q-pull-to-refresh
+          class="products"
+          @refresh="fetchProducts"
+          :key="inventoryStore.products.length"
+        >
           <product-card
             v-for="(product, index) in inventoryStore.products"
             :key="index"
