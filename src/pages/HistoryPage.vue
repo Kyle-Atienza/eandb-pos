@@ -1,5 +1,7 @@
 <template>
-  <header-layout label="History" />
+  <header-layout label="History">
+    <div class="history-header"></div>
+  </header-layout>
   <q-page>
     <page-wrapper>
       <router-view></router-view>

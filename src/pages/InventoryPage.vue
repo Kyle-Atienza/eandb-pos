@@ -25,6 +25,7 @@ import { useInventoryStore } from 'src/stores/inventory';
 import { computed, onBeforeUpdate, onMounted, ref } from 'vue';
 import { alphanumericSort } from 'src/helpers/utils';
 import { api } from 'src/boot/axios';
+import { useQuasar } from 'quasar';
 
 export default {
   components: {
@@ -33,6 +34,8 @@ export default {
     InventoryItem,
   },
   setup() {
+    const $q = useQuasar();
+
     const inventoryStore = useInventoryStore();
     const products = computed(() => inventoryStore.products);
 
@@ -42,7 +45,8 @@ export default {
       inventoryItems.value = [];
     });
 
-    onMounted(() => {
+    const fetchProducts = () => {
+      $q.loading.show();
       api
         .get('/products')
         .then((res) => {
@@ -52,7 +56,16 @@ export default {
         })
         .catch((err) => {
           console.log(err);
+        })
+        .finally(() => {
+          $q.loading.hide();
         });
+    };
+
+    onMounted(() => {
+      if (!products.value.length) {
+        fetchProducts();
+      }
     });
     return { products, alphanumericSort };
   },

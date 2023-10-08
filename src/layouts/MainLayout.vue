@@ -10,7 +10,6 @@
       <router-view />
       <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <layout-fab />
-        <checkout-fab v-if="false" />
       </q-page-sticky>
     </q-page-container>
 
@@ -21,26 +20,15 @@
         v-model="navbarTabs"
         class="bg-primary text-white"
       >
-        <q-tab @click="$router.push('/')" name="dashboard" icon="dashboard" label="Dashboard" />
-        <q-tab
-          @click="$router.push('/history/list')"
-          name="history"
-          icon="list_alt"
-          label="History"
-        />
-        <q-tab
-          @click="$router.push('/inventory')"
-          name="inventory"
-          icon="inventory_2"
-          label="Inventory"
-        />
+        <q-route-tab to="/" name="dashboard" icon="dashboard" label="Dashboard" />
+        <q-route-tab to="/history/list" name="history" icon="list_alt" label="Records" />
+        <q-route-tab to="/inventory" name="inventory" icon="inventory_2" label="Inventory" />
       </q-tabs>
     </q-footer>
   </q-layout>
 </template>
 
 <script>
-import CheckoutFab from 'src/components/common/CounterFab/CounterFab.vue';
 import LayoutFab from 'src/components/common/LayoutFab/LayoutFab.vue';
 
 import { useInvoiceStore } from 'src/stores/invoice';
@@ -49,7 +37,6 @@ import { ref } from 'vue';
 export default {
   name: 'MainLayout',
   components: {
-    CheckoutFab,
     LayoutFab,
   },
   setup() {
