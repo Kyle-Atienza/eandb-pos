@@ -4,7 +4,7 @@
     class="counter-fab"
     @click="action($route.path)"
     fab
-    icon="point_of_sale"
+    icon="receipt_long"
     color="primary"
   >
     <q-badge v-if="invoice.items.length" color="accent" text-color="dark" floating>{{
