@@ -27,9 +27,7 @@ export default {
     const popupRef = ref(null);
 
     const onInvoice = () => {
-      if (route.path === '/') {
-        router.push('/counter');
-      } else if (invoiceStore.isEmpty) {
+      if (invoiceStore.isEmpty) {
         popupRef.value.open('Empty Items', 'Please select at least one item to checkout.', [
           {
             label: 'OK',

@@ -7,6 +7,7 @@ const routes = [
       {
         path: 'counter',
         component: () => import('pages/CounterPage.vue'),
+        name: 'Counter',
       },
       {
         path: 'checkout',

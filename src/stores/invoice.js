@@ -35,6 +35,9 @@ export const useInvoiceStore = defineStore('invoice', {
       const productIndex = this.items.map((item) => item.key).indexOf(key);
       this.items[productIndex] = updatedData;
     },
+    clearItems() {
+      this.items = [];
+    },
     hasItem(key) {
       return this.items.map((item) => item.key).includes(key);
     },

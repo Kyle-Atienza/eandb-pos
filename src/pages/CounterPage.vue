@@ -3,7 +3,7 @@
   <q-page>
     <header-layout label="Counter">
       <div class="row q-pt-md  full-width">
-        <div class="col row flex bg-secondary search-bar">
+        <div class="col row flex bg-secondary search-bar no-wrap">
           <outlined-text-input
             class="col-grow bg-primary"
             label="Product Name"

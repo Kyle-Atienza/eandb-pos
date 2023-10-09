@@ -11,12 +11,12 @@
 
       <q-card-actions align="right">
         <q-btn
-          v-for="({ label, action }, index) in action"
+          v-for="({ label, action, color }, index) in action"
           :key="index"
           class="col"
           unelevated
           :label="label"
-          color="primary"
+          :color="color ?? 'primary'"
           @click="action"
         />
       </q-card-actions>
