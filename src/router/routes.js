@@ -15,6 +15,7 @@ const routes = [
           {
             path: 'items',
             component: () => import('pages/CheckoutItemsPage.vue'),
+            name: 'Checkout Items',
           },
           {
             path: 'details',
