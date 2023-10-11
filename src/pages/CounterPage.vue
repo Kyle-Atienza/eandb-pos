@@ -38,7 +38,7 @@
             />
           </q-card-section>
           <q-card-section class="row q-gutter-y-md">
-            <choice-filter v-model="brands" label="Brands" />
+            <choice-filter v-model="brands" label="Brands" multiple />
           </q-card-section>
           <q-card-actions class="row">
             <q-btn
@@ -90,6 +90,7 @@ import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
 
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
+// import qs from 'qs';
 
 import { useInventoryStore } from 'src/stores/inventory';
 
@@ -123,10 +124,15 @@ export default {
         selected: false,
       },
     ]);
+    const selectedBrands = computed(() => {
+      const selected = brands.value.filter((brand) => brand.selected).map((brand) => brand.name);
+      return selected;
+    });
     const search = ref('');
     const paramsObject = computed(() => ({
       name: search.value,
       brand: brands.value.find((brand) => brand.selected)?.name || '',
+      brands: selectedBrands.value.length ? selectedBrands.value.join(', ') : '',
     }));
     const requestParams = computed(() => new URLSearchParams(paramsObject.value));
 
