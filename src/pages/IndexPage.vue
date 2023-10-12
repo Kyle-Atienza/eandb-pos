@@ -15,7 +15,8 @@
           <q-icon name="point_of_sale" size="sm" />
         </span>
       </q-btn>
-      <h2 class="q-mx-md text-h6">Today</h2>
+      <p class="q-mx-md q-mb-none q-mt-md text-h6">Today</p>
+      <main-dashboard />
     </page-wrapper>
   </q-page>
 </template>
@@ -23,12 +24,13 @@
 <script>
 import HeaderLayout from 'src/components/common/Header/HeaderLayout.vue';
 import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
+import MainDashboard from 'src/components/pages/index/MainDashboard.vue';
 
 import { useInvoiceStore } from 'src/stores/invoice';
 import { computed } from 'vue';
 
 export default {
-  components: { PageWrapper, HeaderLayout },
+  components: { PageWrapper, HeaderLayout, MainDashboard },
   setup() {
     const invoiceStore = useInvoiceStore();
 
