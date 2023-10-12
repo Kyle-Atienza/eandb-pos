@@ -10,6 +10,7 @@ export const useInvoiceStore = defineStore('invoice', {
     notes: '',
     paymentMethod: '',
     items: [],
+    invoices: [],
   }),
   getters: {
     selectedProductVariants() {},
@@ -25,6 +26,9 @@ export const useInvoiceStore = defineStore('invoice', {
     },
   },
   actions: {
+    setInvoices(invoices) {
+      this.invoices = invoices;
+    },
     addItem(product) {
       this.items.push(product);
     },

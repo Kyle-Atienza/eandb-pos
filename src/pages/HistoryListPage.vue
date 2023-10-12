@@ -103,6 +103,7 @@ import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/Outl
 import { api } from 'src/boot/axios';
 import { computed, onMounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
+import { useInvoiceStore } from 'src/stores/invoice';
 
 export default {
   components: {
@@ -112,12 +113,16 @@ export default {
   },
   setup() {
     const $q = useQuasar();
+
+    const invoiceStore = useInvoiceStore();
+
     const dialog = ref(false);
     const dialogShow = ref(false);
     const mounted = ref(false);
     const filterRefresh = ref(1);
 
-    const invoices = ref([]);
+    // const invoices = ref([]);
+    const invoices = computed(() => invoiceStore.invoices);
 
     // search config
     const buyer = ref('');
@@ -158,7 +163,8 @@ export default {
         .then((res) => {
           const { data } = res.data;
 
-          invoices.value = data;
+          // invoices.value = data;
+          invoiceStore.setInvoices(data);
           $q.loading.hide();
         })
         .catch((err) => {
@@ -196,7 +202,9 @@ export default {
 
     onMounted(() => {
       mounted.value = true;
-      fetchInvoices();
+      if (!invoices.value.length) {
+        fetchInvoices();
+      }
     });
 
     return {
