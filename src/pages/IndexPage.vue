@@ -15,7 +15,6 @@
           <q-icon name="point_of_sale" size="sm" />
         </span>
       </q-btn>
-      <p class="q-mx-md q-mb-none q-mt-md text-h6">Today</p>
       <main-dashboard />
     </page-wrapper>
   </q-page>
