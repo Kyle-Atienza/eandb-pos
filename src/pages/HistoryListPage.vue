@@ -100,7 +100,7 @@ import HistoryItem from 'src/components/cards/HistoryItem/HistoryItem.vue';
 import RangeFilter from 'src/components/common/SearchOptions/RangeFilter/RangeFilter.vue';
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 
-import { api } from 'src/boot/axios';
+// import { api } from 'src/boot/axios';
 import { computed, onMounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useInvoiceStore } from 'src/stores/invoice';
@@ -156,20 +156,9 @@ export default {
     const fetchInvoices = () => {
       $q.loading.show();
 
-      api({
-        url: '/invoices',
-        params: requestParams.value,
-      })
-        .then((res) => {
-          const { data } = res.data;
-
-          // invoices.value = data;
-          invoiceStore.setInvoices(data);
-          $q.loading.hide();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      invoiceStore.getAll(requestParams.value).finally(() => {
+        $q.loading.hide();
+      });
     };
 
     const onUpdateParams = () => {

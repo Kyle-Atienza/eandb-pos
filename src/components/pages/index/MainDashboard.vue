@@ -4,7 +4,7 @@
     <q-btn class="self-stretch bg-primary" icon="calendar_month" unelevated flat>
       <q-menu>
         <div class="bg-dark">
-          <q-date v-model="dateRange" class="bg-dark" range />
+          <q-date v-model="dateRange" class="bg-dark" range :options="dateOptions" />
         </div>
       </q-menu>
     </q-btn>
@@ -46,8 +46,6 @@
 <script>
 import { computed, ref } from 'vue';
 
-import { date } from 'quasar';
-
 import { formatDate } from 'src/helpers/date';
 
 import DashboardCard from 'src/components/cards/Dashboard/DashboardCard.vue';
@@ -62,7 +60,7 @@ export default {
     const today = computed(() => Date.now());
     const dateRange = ref(formatDate(today.value));
     const dateLabel = computed(() => {
-      if (dateRange.value === date.formatDate(today.value, 'YYYY/MM/DD')) {
+      if (dateRange.value === formatDate(today.value)) {
         return 'Today';
       }
       if (dateRange.value.from && dateRange.value.to) {
@@ -70,12 +68,12 @@ export default {
       }
       return '';
     });
-    const dateOption = (calendarDate) => calendarDate <= date.formatDate(today.value, 'YYYY/MM/DD');
+    const dateOptions = (calendarDate) => calendarDate <= formatDate(today.value);
 
     return {
       dateRange,
       dateLabel,
-      dateOption,
+      dateOptions,
     };
   },
 };

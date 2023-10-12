@@ -125,6 +125,21 @@ export const useInvoiceStore = defineStore('invoice', {
         })),
       });
     },
+    async getAll(params) {
+      api({
+        url: '/invoices',
+        params,
+      })
+        .then((res) => {
+          const { data } = res.data;
+
+          // invoices.value = data;
+          this.invoices = data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
     reset() {
       this.buyer = '';
       this.contactNumber = '';
