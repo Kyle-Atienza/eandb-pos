@@ -10,6 +10,7 @@
     infinite
     height="100px"
     class="bg-primary text-white carousel"
+    autoplay="2000"
   >
     <q-carousel-slide name="1" class="column">
       <div class="flex column">
