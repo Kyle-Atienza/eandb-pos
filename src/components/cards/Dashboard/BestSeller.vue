@@ -57,8 +57,6 @@ import { useDashboardStore } from 'src/stores/dahsboard';
 
 import { computed, ref } from 'vue';
 
-import tempProduct from 'src/assets/images/temp/tem-product.jpg';
-
 import DashboardCard from './DashboardCard.vue';
 
 export default {
@@ -72,7 +70,6 @@ export default {
     return {
       bestSeller,
       slide: ref('1'),
-      tempProduct,
     };
   },
 };
