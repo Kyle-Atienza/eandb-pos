@@ -100,9 +100,10 @@ import HistoryItem from 'src/components/cards/HistoryItem/HistoryItem.vue';
 import RangeFilter from 'src/components/common/SearchOptions/RangeFilter/RangeFilter.vue';
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 
-import { api } from 'src/boot/axios';
+// import { api } from 'src/boot/axios';
 import { computed, onMounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
+import { useInvoiceStore } from 'src/stores/invoice';
 
 export default {
   components: {
@@ -112,12 +113,16 @@ export default {
   },
   setup() {
     const $q = useQuasar();
+
+    const invoiceStore = useInvoiceStore();
+
     const dialog = ref(false);
     const dialogShow = ref(false);
     const mounted = ref(false);
     const filterRefresh = ref(1);
 
-    const invoices = ref([]);
+    // const invoices = ref([]);
+    const invoices = computed(() => invoiceStore.invoices);
 
     // search config
     const buyer = ref('');
@@ -151,19 +156,9 @@ export default {
     const fetchInvoices = () => {
       $q.loading.show();
 
-      api({
-        url: '/invoices',
-        params: requestParams.value,
-      })
-        .then((res) => {
-          const { data } = res.data;
-
-          invoices.value = data;
-          $q.loading.hide();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      invoiceStore.getAll(requestParams.value).finally(() => {
+        $q.loading.hide();
+      });
     };
 
     const onUpdateParams = () => {
@@ -196,7 +191,9 @@ export default {
 
     onMounted(() => {
       mounted.value = true;
-      fetchInvoices();
+      if (!invoices.value.length) {
+        fetchInvoices();
+      }
     });
 
     return {

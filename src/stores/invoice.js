@@ -10,6 +10,7 @@ export const useInvoiceStore = defineStore('invoice', {
     notes: '',
     paymentMethod: '',
     items: [],
+    invoices: [],
   }),
   getters: {
     selectedProductVariants() {},
@@ -25,6 +26,9 @@ export const useInvoiceStore = defineStore('invoice', {
     },
   },
   actions: {
+    setInvoices(invoices) {
+      this.invoices = invoices;
+    },
     addItem(product) {
       this.items.push(product);
     },
@@ -120,6 +124,21 @@ export const useInvoiceStore = defineStore('invoice', {
           quantity: item.quantity,
         })),
       });
+    },
+    async getAll(params) {
+      api({
+        url: '/invoices',
+        params,
+      })
+        .then((res) => {
+          const { data } = res.data;
+
+          // invoices.value = data;
+          this.invoices = data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     reset() {
       this.buyer = '';
