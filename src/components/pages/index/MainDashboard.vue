@@ -1,79 +1,65 @@
 <template>
   <div class="q-mx-md flex q-mt-md items-center justify-between">
-    <p class="q-mb-none text-h6">{{ dateLabel }}</p>
-    <q-btn class="self-stretch bg-primary" icon="calendar_month" unelevated flat>
-      <q-menu>
-        <div class="bg-dark">
-          <q-date v-model="dateRange" class="bg-dark" range :options="dateOptions" />
-        </div>
-      </q-menu>
-    </q-btn>
+    <dashboard-date @update="fetchInvoice" />
   </div>
 
   <div class="dashboard-cards q-mx-md q-mt-md">
-    <dashboard-card class="dashboard-card dashboard-card--wide" label="Total Sales" icon="payments">
-      <p class="text-h3 q-mb-none text-weight-bold">
-        5,452.00 <span style="font-size: 0.4em" class="text-weight-medium">PHP</span>
-      </p>
-    </dashboard-card>
-    <dashboard-card label="Transactions" class="dashboard-card">
-      <p class="text-h3 q-mb-none text-weight-bold">12</p>
-    </dashboard-card>
-    <dashboard-card label="Best Seller" class="dashboard-card">
-      <best-seller />
-    </dashboard-card>
-    <dashboard-card label="Sales By Brands" class="dashboard-card">
-      <div class="flex column">
-        <div class="flex items-center justify-between">
-          <p class="q-mb-none text-subtitle1">E and B Farm</p>
-          <q-chip size="sm" color="secondary" text-color="dark" label="12" />
-        </div>
-        <q-separator spaced color="secondary" style="height: 2px" />
-        <div class="flex items-center justify-between">
-          <p class="q-mb-none text-subtitle1">NutriPage</p>
-          <q-chip size="sm" color="secondary" text-color="dark" label="12" />
-        </div>
-        <q-separator spaced color="secondary" style="height: 2px" />
-        <div class="flex items-center justify-between">
-          <p class="q-mb-none text-subtitle1">ThreeK</p>
-          <q-chip size="sm" color="secondary" text-color="dark" label="12" />
-        </div>
-      </div>
-    </dashboard-card>
+    <total-sales class="dashboard-card dashboard-card--wide" />
+    <transactions-count class="dashboard-card" />
+    <best-seller class="dashboard-card" />
+    <brand-sales />
   </div>
 </template>
 
 <script>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
-import { formatDate } from 'src/helpers/date';
-
-import DashboardCard from 'src/components/cards/Dashboard/DashboardCard.vue';
-import BestSeller from './BestSeller.vue';
+import { useDashboardStore } from 'src/stores/dahsboard';
+import DashboardDate from './DashboardDate.vue';
+import BestSeller from '../../cards/Dashboard/BestSeller.vue';
+import TotalSales from '../../cards/Dashboard/TotalSales.vue';
+import TransactionsCount from '../../cards/Dashboard/TransactionsCount.vue';
+import BrandSales from '../../cards/Dashboard/BrandSales.vue';
 
 export default {
   components: {
-    DashboardCard,
+    DashboardDate,
     BestSeller,
+    TotalSales,
+    TransactionsCount,
+    BrandSales,
   },
   setup() {
-    const today = computed(() => Date.now());
-    const dateRange = ref(formatDate(today.value));
-    const dateLabel = computed(() => {
-      if (dateRange.value === formatDate(today.value)) {
-        return 'Today';
+    const dashboardStore = useDashboardStore();
+
+    const dashboardDate = ref(null);
+
+    const requestParams = computed(() => {
+      let paramsObject = {};
+      if (dashboardDate.value?.date.from && dashboardDate.value?.date.to) {
+        paramsObject = {
+          date_min: dashboardDate.value?.date.from,
+          date_max: dashboardDate.value?.date.to,
+        };
       }
-      if (dateRange.value.from && dateRange.value.to) {
-        return `${dateRange.value.from} - ${dateRange.value.to}`;
-      }
-      return '';
+      const params = new URLSearchParams(paramsObject);
+      return params;
     });
-    const dateOptions = (calendarDate) => calendarDate <= formatDate(today.value);
+
+    const fetchInvoiceData = () => {
+      dashboardStore.getInvoiceData(requestParams.value);
+    };
+
+    onMounted(() => {
+      fetchInvoiceData();
+      /* if (!invoices.value.length) {
+        fetchInvoice();
+      } */
+    });
 
     return {
-      dateRange,
-      dateLabel,
-      dateOptions,
+      dashboardDate,
+      fetchInvoiceData,
     };
   },
 };
