@@ -13,9 +13,7 @@
 </template>
 
 <script>
-import { useInvoiceStore } from 'src/stores/invoice';
-
-import { computed, inject, reactive } from 'vue';
+import { inject, reactive } from 'vue';
 import PaymentOption from './PaymentOption.vue';
 
 export default {
@@ -23,14 +21,7 @@ export default {
     PaymentOption,
   },
   setup() {
-    const invoice = computed(() => {
-      const fetched = inject('fetchedInvoice');
-      if (!fetched) {
-        return useInvoiceStore();
-      }
-
-      return fetched.value;
-    });
+    const invoice = inject('invoice');
 
     const options = reactive([
       {
