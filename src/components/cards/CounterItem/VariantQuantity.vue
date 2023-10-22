@@ -100,19 +100,12 @@ export default {
   align-items: center;
   gap: 10px;
   min-height: 120px;
-  /* border-radius: 15px; */
-  /* overflow: hidden; */
 
-  /* border-left: 15px solid $dark; */
   margin-left: 15px;
 
   &__value {
     padding: 10px 5px;
     min-width: 50px;
-
-    p {
-      /* font-size: 1.2em; */
-    }
   }
 }
 

@@ -11,6 +11,8 @@ export const useInvoiceStore = defineStore('invoice', {
     paymentMethod: '',
     items: [],
     invoices: [],
+    amountReceived: '',
+    change: '',
   }),
   getters: {
     selectedProductVariants() {},
@@ -101,17 +103,14 @@ export const useInvoiceStore = defineStore('invoice', {
         this.items.splice(itemIndex, 1);
       }
     },
+    setChange() {
+      const total = getTotal(this.items);
+      const isValidAmount = this.amountReceived >= total;
+
+      this.change = isValidAmount ? this.amountReceived - total : '';
+      console.log(total - this.amountReceived);
+    },
     async create() {
-      /* let { items } = this;
-      items = this.items.map((item) => {
-        const invoiceItem = item;
-
-        delete invoiceItem.variant;
-        delete invoiceItem.name;
-
-        return invoiceItem;
-      }); */
-
       return api.post('/invoices', {
         buyer: this.buyer,
         contactNumber: this.contactNumber,
@@ -123,6 +122,8 @@ export const useInvoiceStore = defineStore('invoice', {
           item: item.item,
           quantity: item.quantity,
         })),
+        amountReceived: this.amountReceived,
+        change: this.change,
       });
     },
     async getAll(params) {
