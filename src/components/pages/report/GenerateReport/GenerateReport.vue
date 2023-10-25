@@ -1,9 +1,13 @@
 <template>
-  <q-btn unelevated size="lg" color="secondary" text-color="dark" @click="dialog = true">
-    <span class="flex items-center justify-between full-width">
-      Generate Report
-      <q-icon name="summarize" size="sm" />
-    </span>
+  <q-btn
+    unelevated
+    size="lg"
+    color="dark"
+    text-color="secondary"
+    class="full-width"
+    label="Generate Report"
+    @click="dialog = true"
+  >
   </q-btn>
 
   <q-dialog persistent v-model="dialog">
@@ -15,6 +19,7 @@
 
       <q-card-section class="border-bottom main-section">
         <range-filter group="history-filter" label="Date" v-model="rangeDate" date />
+        <choice-filter v-model="brands" label="Brands" multiple />
         <outlined-text-input
           label="Recipient"
           v-model="recipient"
@@ -50,6 +55,7 @@
 import RangeFilter from 'src/components/common/SearchOptions/RangeFilter/RangeFilter.vue';
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
 import AlertPopup from 'src/components/common/AlertPopup/AlertPopup.vue';
+import ChoiceFilter from 'src/components/common/SearchOptions/ChoiceFilter/ChoiceFilter.vue';
 
 import { computed, ref } from 'vue';
 import { isObjectUnfilled } from 'src/helpers/utils';
@@ -62,6 +68,7 @@ export default {
     RangeFilter,
     OutlinedTextInput,
     AlertPopup,
+    ChoiceFilter,
   },
   setup() {
     const $q = useQuasar();
@@ -75,6 +82,20 @@ export default {
       from: '',
       to: '',
     });
+    const brands = ref([
+      {
+        name: 'E and B Farm',
+        selected: true,
+      },
+      {
+        name: 'NutriPage',
+        selected: true,
+      },
+      {
+        name: 'ThreeK',
+        selected: true,
+      },
+    ]);
 
     const requestParams = computed(() => {
       const params = new URLSearchParams({
@@ -127,6 +148,7 @@ export default {
       alertPopup,
       rangeDate,
       recipient,
+      brands,
 
       generateReport,
       onSendReport,

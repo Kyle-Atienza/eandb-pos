@@ -7,10 +7,15 @@
     <template v-slot:header>
       <q-item-section>{{ label }}</q-item-section>
       <q-item-section side>
-        <div v-if="date" class="row items-center">
-          <q-chip color="primary" text-color="secondary">{{ from || 'From' }}</q-chip>
-          <q-icon class="q-mx-sm" size="xs" name="horizontal_rule" color="secondary" />
-          <q-chip color="primary" text-color="secondary">{{ to || 'To' }}</q-chip>
+        <div v-if="date">
+          <div v-if="!isDefault" class="row items-center">
+            <q-chip color="primary" text-color="secondary">{{ from || 'From' }}</q-chip>
+            <q-icon class="q-mx-sm" size="xs" name="horizontal_rule" color="secondary" />
+            <q-chip color="primary" text-color="secondary">{{ to || 'To' }}</q-chip>
+          </div>
+          <div v-else class="row items-center">
+            <q-chip color="primary" text-color="secondary">{{ isToday ? 'Today' : 'All' }}</q-chip>
+          </div>
         </div>
         <div v-else class="row items-center">
           <q-chip color="primary" text-color="secondary">{{ min || 'Min' }}</q-chip>
@@ -37,7 +42,13 @@
           <q-btn v-if="date" class="self-stretch bg-primary" icon="calendar_month" unelevated flat>
             <q-menu>
               <div class="bg-dark">
-                <q-date v-model="dateRange" class="bg-dark" range />
+                <q-date
+                  v-model="dateRange"
+                  class="bg-dark"
+                  range
+                  today-btn
+                  @update:model-value="onUpdateCal"
+                />
               </div>
             </q-menu>
           </q-btn>
@@ -68,6 +79,8 @@
 import { computed, onMounted, ref, watch } from 'vue';
 
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
+import { formatDate } from 'src/helpers/date';
+// import { formatDate } from 'src/helpers/date';
 
 export default {
   components: {
@@ -83,6 +96,7 @@ export default {
     const min = ref();
     const max = ref();
     const dateRange = ref({ from: null, to: null });
+    const isToday = ref(false);
 
     const transformDate = (inputDate) => {
       const parts = inputDate.split('/');
@@ -95,6 +109,7 @@ export default {
 
     const from = computed(() => (dateRange.value.from ? transformDate(dateRange.value.from) : ''));
     const to = computed(() => (dateRange.value.to ? transformDate(dateRange.value.to) : ''));
+    const isDefault = computed(() => !from.value && !to.value);
 
     watch([min, max, from, to], () => {
       let updatedValue = {};
@@ -110,6 +125,7 @@ export default {
         };
       }
       emit('update:modelValue', updatedValue);
+      console.log(from.value, to.value);
     });
 
     onMounted(() => {
@@ -129,12 +145,19 @@ export default {
       dateRange.value = { from: null, to: null };
     };
 
+    const onUpdateCal = (e) => {
+      isToday.value = e === formatDate(new Date());
+    };
+
     return {
       min,
       max,
       from,
       to,
+      isDefault,
       dateRange,
+      isToday,
+      onUpdateCal,
       reset,
     };
   },

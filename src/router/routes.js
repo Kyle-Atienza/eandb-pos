@@ -46,6 +46,11 @@ const routes = [
         path: 'inventory',
         component: () => import('pages/InventoryPage.vue'),
       },
+      {
+        path: 'report',
+        component: () => import('pages/ReportPage.vue'),
+        name: 'Report',
+      },
     ],
   },
 
