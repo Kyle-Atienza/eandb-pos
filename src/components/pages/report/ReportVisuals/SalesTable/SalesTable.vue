@@ -9,8 +9,8 @@
       flat
       bordered
       color="dark"
-      :rows="rows"
-      :columns="columns"
+      :rows="tableData.rows"
+      :columns="tableData.columns"
       row-key="name"
     />
   </div>
@@ -35,7 +35,7 @@
         <select-input
           class="col"
           v-model="productOptions.value"
-          :items="productOptions.choices"
+          :items="productChoices"
           label="Products"
         />
         <select-input
@@ -56,14 +56,14 @@
         />
       </q-card-section>
       <q-card-actions class="row">
-        <q-btn class="col bg-negative" label="Cancel" flat unelevated />
+        <q-btn class="col bg-negative" label="Cancel" flat unelevated @click="resetOptions" />
         <q-btn
           class="col bg-primary"
           label="OK"
           color="secondary"
           flat
           unelevated
-          @click="onGroupRows"
+          @click="setOptions"
         />
       </q-card-actions>
     </q-card>
@@ -78,120 +78,34 @@ import { useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
 import { useInventoryStore } from 'src/stores/inventory';
 
+import { salesTablesColumns } from 'src/constants/tables.js';
+
 export default {
   components: {
     SelectInput,
   },
   setup() {
-    const inventoryStore = useInventoryStore();
-    const products = computed(() => inventoryStore.products);
-
     const $q = useQuasar();
-    const columns = ref([
-      {
-        name: 'product',
-        label: 'Product',
-        field: 'product',
-        align: 'left',
-        required: true,
-        sortable: true,
-      },
-      {
-        name: 'variant',
-        label: 'Variant',
-        field: 'variant',
-        align: 'left',
-        required: true,
-        sortable: true,
-      },
-      {
-        name: 'modifier',
-        label: 'Modifier',
-        field: 'modifier',
-        align: 'left',
-        required: true,
-        sortable: true,
-      },
-      {
-        name: 'sold',
-        label: 'Sold',
-        field: 'sold',
-        align: 'left',
-        required: true,
-        sortable: true,
-      },
-      {
-        name: 'sales',
-        label: 'Sales',
-        field: 'sales',
-        align: 'left',
-        required: true,
-        sortable: true,
-      },
-    ]);
-    const rows = ref([
-      {
-        modifier: 'Sea Salt',
-        product: 'Taro Chips',
-        variant: '175g',
-        sales: 100,
-        sold: 1,
-      },
-      {
-        _id: '64fc900ff0a869d1b094931f_64fc900ff0a869d1b0949320_Honey Butter',
-        modifier: 'Honey Butter',
-        product: 'Taro Chips',
-        variant: '175g',
-        sales: 100,
-        sold: 1,
-      },
-      {
-        _id: '64fc900ff0a869d1b094931f_64fc900ff0a869d1b0949320_Cheese',
-        modifier: 'Cheese',
-        product: 'Taro Chips',
-        variant: '175g',
-        sales: 200,
-        sold: 2,
-      },
-      {
-        _id: '64fc900ff0a869d1b094931f_64fc900ff0a869d1b0949320_Honey-Butter',
-        modifier: 'Honey-Butter',
-        product: 'Taro Chips',
-        variant: '175g',
-        sales: 100,
-        sold: 1,
-      },
-      {
-        _id: '64fc43a61118c9139e7665fa_64fc43a61118c9139e7665fb',
-        modifier: '',
-        product: 'Oyster Mushroom Spanish Style',
-        variant: '220g',
-        sales: 3300,
-        sold: 15,
-      },
-      {
-        _id: '64fc82447ae287cceb331213_64fc82447ae287cceb331214',
-        modifier: '',
-        product: 'Oyster Mushroom Sisig',
-        variant: '220g',
-        sales: 2200,
-        sold: 10,
-      },
-      {
-        _id: '64fc86a57ae287cceb33121a_64fc86a57ae287cceb33121b',
-        modifier: '',
-        product: 'Oyster Mushroom Chilli Garlic Paste',
-        variant: '120g',
-        sales: 220,
-        sold: 1,
-      },
-    ]);
+    const inventoryStore = useInventoryStore();
+
     const optionsDialog = ref(false);
+    const data = ref([]);
+
+    const products = computed(() => inventoryStore.products);
+    const productChoices = computed(() => [
+      'Show All',
+      ...new Set(data.value.map((row) => row.product)),
+    ]);
+
+    const tableData = reactive({
+      columns: [],
+      rows: [],
+    });
 
     const productOptions = reactive({
       show: false,
       value: 'Show All',
-      choices: ['Show All', ...new Set(rows.value.map((row) => row.product))],
+      choices: [],
     });
     const variantOptions = reactive({
       show: false,
@@ -203,12 +117,48 @@ export default {
       value: '',
       choices: [],
     });
-
-    watch(rows, (invoices) => {
-      productOptions.value = 'Show All';
-      productOptions.choices = ['Show All', ...new Set(invoices.map((row) => row.product))];
-      productOptions.show = productOptions.value !== 'Show All';
+    const tableOptions = reactive({
+      product: '',
+      variant: '',
+      modifier: '',
     });
+
+    const setTableData = (columns, rows) => {
+      tableData.columns = columns;
+      tableData.rows = rows;
+    };
+
+    const groupRowsByProduct = (rows) => {
+      const grouped = Object.groupBy(rows, ({ product }) => product);
+      return grouped;
+    };
+
+    const getProductVariants = (rows, product) => {
+      const targetProduct = groupRowsByProduct(rows)[product];
+      return targetProduct;
+    };
+
+    const mapGroupedRows = (groupedRows) => {
+      const mappedRows = Object.keys(groupedRows).map((row) => {
+        const sold = groupedRows[row].reduce((total, item) => {
+          total += item.sold;
+          return total;
+        }, 0);
+        const sales = groupedRows[row].reduce((total, item) => {
+          total += item.sales;
+          return total;
+        }, 0);
+
+        return {
+          product: row,
+          sold,
+          sales,
+        };
+      });
+
+      return mappedRows;
+    };
+
     watch(
       () => productOptions.value,
       (value) => {
@@ -242,12 +192,23 @@ export default {
       }
     );
 
-    const onGroupRows = () => {
-      const selectedProduct = productOptions.value !== 'Show All' ? productOptions.value : '';
-      const selectedVariant = variantOptions.value !== 'Show All' ? variantOptions.value : '';
-      const selectedModifier = modifierOptions.value !== 'Show All' ? modifierOptions.value : '';
+    const setOptions = () => {
+      tableOptions.product = productOptions.value !== 'Show All' ? productOptions.value : '';
+      tableOptions.variant = variantOptions.value !== 'Show All' ? variantOptions.value : '';
+      tableOptions.modifier = modifierOptions.value !== 'Show All' ? modifierOptions.value : '';
 
-      console.log(selectedProduct, selectedVariant, selectedModifier);
+      console.log(tableOptions);
+      if (tableOptions.product !== '' && tableOptions.product !== 'Show All') {
+        setTableData(
+          salesTablesColumns.groupedVariant,
+          getProductVariants(data.value, tableOptions.product)
+        );
+      } else {
+        setTableData(
+          salesTablesColumns.groupedProduct,
+          mapGroupedRows(groupRowsByProduct(data.value))
+        );
+      }
     };
 
     const filters = inject('reportFilters');
@@ -261,76 +222,47 @@ export default {
         });
       }
 
-      if (true) {
-        // wtf
-        $q.loading.show();
+      $q.loading.show();
 
-        api({
-          url: '/reports/invoice',
+      api({
+        url: '/reports/invoice',
+      })
+        .then((res) => {
+          data.value = res.data.rows;
+          productOptions.choices = ['Show All', ...new Set(data.value.map((row) => row.product))];
+
+          setTableData(
+            salesTablesColumns.groupedProduct,
+            mapGroupedRows(groupRowsByProduct(data.value))
+          );
+
+          console.log(getProductVariants(data.value, 'Oyster Mushroom Chicharon'));
         })
-          .then((res) => {
-            columns.value = [
-              {
-                name: 'product',
-                label: 'Product',
-                field: 'product',
-                align: 'left',
-                required: true,
-                sortable: true,
-              },
-              {
-                name: 'variant',
-                label: 'Variant',
-                field: 'variant',
-                align: 'left',
-                required: true,
-                sortable: true,
-              },
-              {
-                name: 'modifier',
-                label: 'Modifier',
-                field: 'modifier',
-                align: 'left',
-                required: true,
-                sortable: true,
-              },
-              {
-                name: 'sold',
-                label: 'Sold',
-                field: 'sold',
-                align: 'left',
-                required: true,
-                sortable: true,
-              },
-              {
-                name: 'sales',
-                label: 'Sales',
-                field: 'sales',
-                align: 'left',
-                required: true,
-                sortable: true,
-              },
-            ];
-            rows.value = res.data.rows;
-          })
-          .catch((e) => {
-            console.log(e);
-          })
-          .finally(() => {
-            $q.loading.hide();
-          });
-      }
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally(() => {
+          $q.loading.hide();
+        });
     });
 
     return {
+      data,
+      productChoices,
       filters,
-      columns,
-      rows,
       productOptions,
       variantOptions,
       modifierOptions,
-      onGroupRows,
       optionsDialog,
+      tableOptions,
+      tableData,
+      salesTablesColumns,
+
+      setOptions,
+      getProductVariants,
+      groupRowsByProduct,
+      mapGroupedRows,
+      setTableData,
     };
   },
 };
