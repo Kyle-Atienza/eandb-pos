@@ -25,9 +25,6 @@
             <q-icon class="q-mx-sm" size="xs" name="horizontal_rule" color="secondary" />
             <q-chip color="primary" text-color="secondary">{{ max || 'Max' }}</q-chip>
           </div>
-          <!-- <div>
-            <q-chip @click.self="reset()" color="primary" text-color="secondary">Reset</q-chip>
-          </div> -->
         </div>
       </q-item-section>
     </template>
@@ -53,7 +50,6 @@
                   v-model="dateRange"
                   class="bg-dark no-shadow"
                   range
-                  today-btn
                   @update:model-value="onUpdateCal"
                 />
               </div>
@@ -156,7 +152,7 @@ export default {
     const reset = () => {
       min.value = 0;
       max.value = 0;
-      dateRange.value = { from: null, to: null };
+      dateRange.value = { from: '', to: '' };
     };
 
     const onUpdateCal = (e) => {
