@@ -109,6 +109,8 @@ export default {
     const optionsDialog = ref(false);
     const data = ref([]);
 
+    const filters = inject('reportFilters');
+
     const products = computed(() => inventoryStore.products);
     const productChoices = computed(() => [
       'Show All',
@@ -145,12 +147,10 @@ export default {
       tableData.columns = columns;
       tableData.rows = rows;
     };
-
     const groupRowsByProduct = (rows) => {
       const grouped = Object.groupBy(rows, ({ product }) => product);
       return grouped;
     };
-
     const getProductVariants = (rows, product) => {
       const targetProduct = groupRowsByProduct(rows)[product];
       return targetProduct;
@@ -249,13 +249,40 @@ export default {
         setOptions();
       }
     );
+    watch(data, () => {
+      setTableData(
+        salesTablesColumns.groupedProduct,
+        mapGroupedRows(groupRowsByProduct(data.value))
+      );
+    });
+    watch(filters, async ({ rangeDate }) => {
+      $q.loading.show();
 
-    const filters = inject('reportFilters');
+      await api({
+        url: '/reports/invoice',
+        params: new URLSearchParams({
+          date_min: rangeDate.from,
+          date_max: rangeDate.to,
+        }),
+      })
+        .then((res) => {
+          data.value = res.data.rows;
+          productOptions.choices = ['Show All', ...new Set(data.value.map((row) => row.product))];
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally(() => {
+          $q.loading.hide();
+        });
+    });
 
     onMounted(async () => {
       $q.loading.show();
 
-      await inventoryStore.fetchItems();
+      if (!products.value.length) {
+        await inventoryStore.fetchItems();
+      }
 
       await api({
         url: '/reports/invoice',
@@ -263,13 +290,6 @@ export default {
         .then((res) => {
           data.value = res.data.rows;
           productOptions.choices = ['Show All', ...new Set(data.value.map((row) => row.product))];
-
-          setTableData(
-            salesTablesColumns.groupedProduct,
-            mapGroupedRows(groupRowsByProduct(data.value))
-          );
-
-          console.log(getProductVariants(data.value, 'Oyster Mushroom Chicharon'));
         })
         .catch((e) => {
           console.log(e);
