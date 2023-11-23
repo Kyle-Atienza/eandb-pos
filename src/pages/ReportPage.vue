@@ -3,14 +3,23 @@
   <q-page>
     <page-wrapper>
       <div class="filters">
-        <range-filter
-          class="q-mx-md"
-          group="history-filter"
-          label="Dates"
-          v-model="filters.rangeDate"
-          date
-        />
-        <choice-filter class="q-mx-md" v-model="filters.brands" label="Brands" multiple />
+        <q-expansion-item
+          class="range-filter q-pa-none q-mx-md"
+          header-class="range-filter__header"
+        >
+          <template v-slot:header>
+            <q-item-section>Options</q-item-section>
+            <q-item-section side>
+              <div>
+                <!-- <q-chip color="primary" text-color="secondary" label="Dates" size="sm" /> -->
+              </div>
+            </q-item-section>
+          </template>
+          <q-card>
+            <range-filter group="history-filter" label="Dates" v-model="filters.rangeDate" date />
+            <choice-filter v-model="filters.brands" label="Brands" multiple />
+          </q-card>
+        </q-expansion-item>
       </div>
 
       <sales-table />
@@ -18,7 +27,9 @@
   </q-page>
 
   <teleport-wrapper to=".footer-slot">
-    <generate-report />
+    <div class="col">
+      <generate-report />
+    </div>
   </teleport-wrapper>
 </template>
 
@@ -87,5 +98,24 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.range-filter {
+  background: darken($dark, 5);
+  border-radius: 15px;
+  overflow: hidden;
+
+  ::v-deep &__header {
+    .q-icon {
+      color: $primary;
+    }
+  }
+}
+.q-card {
+  background: darken($dark, 5);
+
+  &__section:first-child::after {
+    display: none;
+  }
 }
 </style>

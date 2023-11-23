@@ -125,7 +125,6 @@ export default {
         };
       }
       emit('update:modelValue', updatedValue);
-      console.log(from.value, to.value);
     });
 
     onMounted(() => {

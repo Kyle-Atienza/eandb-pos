@@ -4,6 +4,24 @@
       <p class="text-h5 col q-mb-none">Sales</p>
       <q-btn icon="tune" flat unelevated @click="optionsDialog = true"></q-btn>
     </div>
+    <div v-if="tableOptions.product" class="flex q-py-sm q-gutter-sm">
+      <div>
+        <q-chip
+          v-if="tableOptions.product"
+          :label="tableOptions.product"
+          color="primary"
+          text-color="secondary"
+        />
+      </div>
+      <div>
+        <q-chip
+          v-if="tableOptions.variant"
+          :label="tableOptions.variant"
+          color="primary"
+          text-color="secondary"
+        />
+      </div>
+    </div>
     <q-table
       class="table q-mt-sm bg-secondary text-dark"
       flat
@@ -46,25 +64,25 @@
           :key="variantOptions.choices.length"
           label="Variants"
         />
-        <select-input
+        <!-- <select-input
           class="col"
           v-if="modifierOptions.show"
           v-model="modifierOptions.value"
           :items="modifierOptions.choices"
           :key="modifierOptions.choices.length"
           label="Modifier"
-        />
+        /> -->
       </q-card-section>
       <q-card-actions class="row">
-        <q-btn class="col bg-negative" label="Cancel" flat unelevated @click="resetOptions" />
-        <q-btn
-          class="col bg-primary"
-          label="OK"
-          color="secondary"
+        <q-btn class="col bg-negative" label="Reset" flat unelevated @click="resetOptions" />
+        <!-- <q-btn
+          class="col bg-warning"
+          label="Cancel"
+          color="dark"
           flat
           unelevated
           @click="setOptions"
-        />
+        /> -->
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -159,20 +177,53 @@ export default {
       return mappedRows;
     };
 
+    const setOptions = () => {
+      tableOptions.product = productOptions.value !== 'Show All' ? productOptions.value : '';
+      tableOptions.variant = variantOptions.value !== 'Show All' ? variantOptions.value : '';
+      tableOptions.modifier = modifierOptions.value !== 'Show All' ? modifierOptions.value : '';
+
+      if (productOptions.value !== '' && productOptions.value !== 'Show All') {
+        if (variantOptions.value !== '' && variantOptions.value !== 'Show All') {
+          setTableData(
+            salesTablesColumns.groupedVariants,
+            getProductVariants(data.value, productOptions.value).filter(
+              ({ variant }) => variant === variantOptions.value
+            )
+          );
+        } else {
+          setTableData(
+            salesTablesColumns.productVariants,
+            getProductVariants(data.value, productOptions.value)
+          );
+        }
+      } else {
+        setTableData(
+          salesTablesColumns.groupedProduct,
+          mapGroupedRows(groupRowsByProduct(data.value))
+        );
+      }
+    };
+
+    const resetOptions = () => {
+      productOptions.value = 'Show All';
+      variantOptions.value = '';
+
+      tableOptions.product = '';
+      tableOptions.variant = '';
+    };
+
     watch(
       () => productOptions.value,
       (value) => {
         const hasSelectedProduct = value !== 'Show All';
-
+        variantOptions.show = hasSelectedProduct;
         if (hasSelectedProduct && products.value.length) {
           const selectedProduct = products.value.find((product) => product.name === value);
 
           variantOptions.choices = selectedProduct.variants.map((variant) => variant.name);
           modifierOptions.choices = selectedProduct.modifier.values;
 
-          variantOptions.show = hasSelectedProduct;
           modifierOptions.show = selectedProduct.modifier.values.length;
-
           if (variantOptions.choices.length === 1) {
             // eslint-disable-next-line prefer-destructuring
             variantOptions.value = variantOptions.choices[0];
@@ -189,42 +240,24 @@ export default {
             modifierOptions.choices = ['Show All', ...modifierOptions.choices];
           }
         }
+        setOptions();
+      }
+    );
+    watch(
+      () => variantOptions.value,
+      () => {
+        setOptions();
       }
     );
 
-    const setOptions = () => {
-      tableOptions.product = productOptions.value !== 'Show All' ? productOptions.value : '';
-      tableOptions.variant = variantOptions.value !== 'Show All' ? variantOptions.value : '';
-      tableOptions.modifier = modifierOptions.value !== 'Show All' ? modifierOptions.value : '';
-
-      console.log(tableOptions);
-      if (tableOptions.product !== '' && tableOptions.product !== 'Show All') {
-        setTableData(
-          salesTablesColumns.groupedVariant,
-          getProductVariants(data.value, tableOptions.product)
-        );
-      } else {
-        setTableData(
-          salesTablesColumns.groupedProduct,
-          mapGroupedRows(groupRowsByProduct(data.value))
-        );
-      }
-    };
-
     const filters = inject('reportFilters');
 
-    onMounted(() => {
-      if (!products.value.length) {
-        $q.loading.show();
-
-        inventoryStore.fetchItems().finally(() => {
-          $q.loading.show();
-        });
-      }
-
+    onMounted(async () => {
       $q.loading.show();
 
-      api({
+      await inventoryStore.fetchItems();
+
+      await api({
         url: '/reports/invoice',
       })
         .then((res) => {
@@ -259,6 +292,7 @@ export default {
       salesTablesColumns,
 
       setOptions,
+      resetOptions,
       getProductVariants,
       groupRowsByProduct,
       mapGroupedRows,

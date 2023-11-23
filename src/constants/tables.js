@@ -24,7 +24,7 @@ const groupedProduct = [
     sortable: true,
   },
 ];
-const groupedVariant = [
+const productVariants = [
   {
     name: 'variant',
     label: 'Variant',
@@ -58,7 +58,7 @@ const groupedVariant = [
     sortable: true,
   },
 ];
-const groupedModifier = [
+const groupedVariants = [
   {
     name: 'modifier',
     label: 'Modifier',
@@ -87,6 +87,6 @@ const groupedModifier = [
 
 export const salesTablesColumns = {
   groupedProduct,
-  groupedVariant,
-  groupedModifier,
+  productVariants,
+  groupedVariants,
 };
