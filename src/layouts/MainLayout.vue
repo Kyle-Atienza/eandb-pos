@@ -43,7 +43,7 @@ export default {
     const invoice = useInvoiceStore();
 
     const navbarTabs = ref('dashboard');
-    const hideTabs = ['checkout'];
+    const hideTabs = ref(['checkout', '/report']);
 
     return {
       invoice,

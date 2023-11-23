@@ -15,13 +15,12 @@
             <q-icon name="point_of_sale" size="sm" />
           </span>
         </q-btn>
-        <generate-report />
-        <!-- <q-btn unelevated size="lg" color="secondary" text-color="dark">
+        <q-btn unelevated size="lg" color="secondary" text-color="dark" to="/report">
           <span class="flex items-center justify-between full-width">
             Generate Report
             <q-icon name="summarize" size="sm" />
           </span>
-        </q-btn> -->
+        </q-btn>
       </div>
       <main-dashboard />
     </page-wrapper>
@@ -32,13 +31,11 @@
 import HeaderLayout from 'src/components/common/Header/HeaderLayout.vue';
 import PageWrapper from 'src/components/common/PageWrapper/PageWrapper.vue';
 import MainDashboard from 'src/components/pages/index/MainDashboard.vue';
-import GenerateReport from 'src/components/pages/index/GenerateReport.vue';
-
 import { useInvoiceStore } from 'src/stores/invoice';
 import { computed } from 'vue';
 
 export default {
-  components: { PageWrapper, HeaderLayout, MainDashboard, GenerateReport },
+  components: { PageWrapper, HeaderLayout, MainDashboard },
   setup() {
     const invoiceStore = useInvoiceStore();
 

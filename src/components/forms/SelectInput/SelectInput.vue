@@ -5,6 +5,8 @@
     :options="items"
     outlined
     v-bind="$attrs"
+    :color="color"
+    :label-color="labelColor"
   >
     <!-- <template v-slot:prepend>
       <q-chip style="font-size: 0.45em" :color="this.$attrs['label-color']">
@@ -21,7 +23,14 @@ export default {
   props: {
     items: Array,
     border: Boolean,
-    color: String,
+    color: {
+      type: String,
+      default: 'secondary',
+    },
+    labelColor: {
+      type: String,
+      default: 'secondary',
+    },
   },
   emits: ['pick'],
   setup(props, { emit }) {
