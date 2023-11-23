@@ -212,6 +212,16 @@ export default {
       tableOptions.variant = '';
     };
 
+    const requestParams = ({ rangeDate, brands }) => {
+      const params = new URLSearchParams({
+        date_min: rangeDate.from,
+        date_max: rangeDate.to,
+        brands: brands.filter((brand) => brand.selected).map((brand) => brand.name),
+      });
+
+      return params;
+    };
+
     watch(
       () => productOptions.value,
       (value) => {
@@ -255,26 +265,28 @@ export default {
         mapGroupedRows(groupRowsByProduct(data.value))
       );
     });
-    watch(filters, async ({ rangeDate }) => {
+    watch(filters, async ({ rangeDate, brands }) => {
+      // check for filter changes
       $q.loading.show();
 
-      await api({
-        url: '/reports/invoice',
-        params: new URLSearchParams({
-          date_min: rangeDate.from,
-          date_max: rangeDate.to,
-        }),
-      })
-        .then((res) => {
-          data.value = res.data.rows;
-          productOptions.choices = ['Show All', ...new Set(data.value.map((row) => row.product))];
+      console.log(rangeDate, brands);
+
+      if (true) {
+        await api({
+          url: '/reports/invoice',
+          params: requestParams(filters),
         })
-        .catch((e) => {
-          console.log(e);
-        })
-        .finally(() => {
-          $q.loading.hide();
-        });
+          .then((res) => {
+            data.value = res.data.rows;
+            productOptions.choices = ['Show All', ...new Set(data.value.map((row) => row.product))];
+          })
+          .catch((e) => {
+            console.log(e);
+          })
+          .finally(() => {
+            $q.loading.hide();
+          });
+      }
     });
 
     onMounted(async () => {
@@ -286,6 +298,7 @@ export default {
 
       await api({
         url: '/reports/invoice',
+        params: requestParams(filters),
       })
         .then((res) => {
           data.value = res.data.rows;

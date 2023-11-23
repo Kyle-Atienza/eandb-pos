@@ -11,11 +11,19 @@
             <q-item-section>Options</q-item-section>
             <q-item-section side>
               <div>
-                <!-- <q-chip color="primary" text-color="secondary" label="Dates" size="sm" /> -->
+                <q-chip
+                  v-if="filters.rangeDate.from && filters.rangeDate.to"
+                  color="primary"
+                  text-color="secondary"
+                  label="Dates"
+                  size="sm"
+                />
+                <!-- <q-chip color="primary" text-color="secondary" label="Brands" size="sm" /> -->
               </div>
             </q-item-section>
           </template>
           <q-card>
+            <!-- TODO: Reset date values -->
             <range-filter group="history-filter" label="Dates" v-model="filters.rangeDate" date />
             <choice-filter v-model="filters.brands" label="Brands" multiple />
           </q-card>

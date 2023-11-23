@@ -7,26 +7,33 @@
     <template v-slot:header>
       <q-item-section>{{ label }}</q-item-section>
       <q-item-section side>
-        <div v-if="date">
-          <div v-if="!isDefault" class="row items-center">
-            <q-chip color="primary" text-color="secondary">{{ from || 'From' }}</q-chip>
-            <q-icon class="q-mx-sm" size="xs" name="horizontal_rule" color="secondary" />
-            <q-chip color="primary" text-color="secondary">{{ to || 'To' }}</q-chip>
+        <div class="flex q-gutter-sm">
+          <div v-if="date">
+            <div v-if="!isDefault" class="row items-center">
+              <q-chip color="primary" text-color="secondary">{{ from || 'From' }}</q-chip>
+              <q-icon class="q-mx-sm" size="xs" name="horizontal_rule" color="secondary" />
+              <q-chip color="primary" text-color="secondary">{{ to || 'To' }}</q-chip>
+            </div>
+            <div v-else class="row items-center">
+              <q-chip color="primary" text-color="secondary">{{
+                isToday ? 'Today' : 'All'
+              }}</q-chip>
+            </div>
           </div>
           <div v-else class="row items-center">
-            <q-chip color="primary" text-color="secondary">{{ isToday ? 'Today' : 'All' }}</q-chip>
+            <q-chip color="primary" text-color="secondary">{{ min || 'Min' }}</q-chip>
+            <q-icon class="q-mx-sm" size="xs" name="horizontal_rule" color="secondary" />
+            <q-chip color="primary" text-color="secondary">{{ max || 'Max' }}</q-chip>
           </div>
-        </div>
-        <div v-else class="row items-center">
-          <q-chip color="primary" text-color="secondary">{{ min || 'Min' }}</q-chip>
-          <q-icon class="q-mx-sm" size="xs" name="horizontal_rule" color="secondary" />
-          <q-chip color="primary" text-color="secondary">{{ max || 'Max' }}</q-chip>
+          <!-- <div>
+            <q-chip @click.self="reset()" color="primary" text-color="secondary">Reset</q-chip>
+          </div> -->
         </div>
       </q-item-section>
     </template>
     <q-card>
-      <q-card-section class="">
-        <div v-if="date" class="row q-gutter-md items-center">
+      <q-card-section class="q-pt-none">
+        <div v-if="date" class="row q-gutter-x-md items-center">
           <outlined-text-input
             class="col no-pointer-events"
             label="From"
@@ -39,17 +46,25 @@
             placeholder="20"
             v-model="to"
           />
-          <q-btn v-if="date" class="self-stretch bg-primary" icon="calendar_month" unelevated flat>
-            <q-menu>
-              <div class="bg-dark">
+          <q-btn class="self-stretch bg-primary" icon="calendar_month" unelevated flat>
+            <q-menu class="bg-dark flex column">
+              <div>
                 <q-date
                   v-model="dateRange"
-                  class="bg-dark"
+                  class="bg-dark no-shadow"
                   range
                   today-btn
                   @update:model-value="onUpdateCal"
                 />
               </div>
+              <q-btn
+                class="self-stretch bg-negative q-mx-md q-mb-md"
+                label="Reset"
+                color=""
+                unelevated
+                flat
+                @click="dateRange = { from: '', to: '' }"
+              />
             </q-menu>
           </q-btn>
         </div>
