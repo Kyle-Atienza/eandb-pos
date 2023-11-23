@@ -52,6 +52,12 @@ const mapEmptyFieldErrorMessage = (errorArray) => {
   return errorMessage;
 };
 
+function isObjectUnfilled(obj) {
+  return Object.keys(obj).some(
+    (key) => obj[key] === null || obj[key] === undefined || obj[key] === ''
+  );
+}
+
 export {
   parseAmount,
   getProductItemId,
@@ -59,4 +65,5 @@ export {
   alphanumericSort,
   checkEmptyObjectValues,
   mapEmptyFieldErrorMessage,
+  isObjectUnfilled,
 };

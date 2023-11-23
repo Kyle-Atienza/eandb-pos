@@ -6,6 +6,10 @@ body {
   color: $secondary;
 }
 
+q, span, h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2em !important;
+}
+
 .q-card {
   border-radius: 20px !important;
   width: 100%;
@@ -13,10 +17,10 @@ body {
   background-color: $dark;
   color: $secondary;
 
-  &__section:first-child {
+  &__section {
     position: relative;
 
-    &::after {
+    &:first-child::after, &.border-bottom::after {
       content: '';
       position: absolute;
       bottom: 0;
@@ -26,6 +30,7 @@ body {
       height: 1px;
       background-color: $secondary;
       border-radius: 100px;
+
     }
   }
 
@@ -47,6 +52,10 @@ body {
 .q-btn {
   text-transform: none;
   border-radius: 15px;
+
+  &--outline::before {
+    border: 2px solid currentColor;
+  }
 }
 
 .q-chip {
@@ -71,14 +80,15 @@ body {
   }
 
   .q-field__control-container {
-    padding-top: 40px !important;
+    padding-top: 30px !important;
+    padding-bottom: 4px;
   }
 
   .q-field__label {
-    background: $secondary;
+    background: $dark;
     padding: 0.2em 0.5em;
     border-radius: 999px;
-    top: 24px;
+    top: 18px;
     color: $dark;
   }
 }

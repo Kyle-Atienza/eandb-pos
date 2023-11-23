@@ -13,7 +13,7 @@
 
   <q-tab-panels v-if="invoice" v-model="tab" animated>
     <q-tab-panel class="q-py-md q-px-none" name="items">
-      <checkout-items />
+      <checkout-items history />
     </q-tab-panel>
 
     <q-tab-panel class="q-py-md q-px-none" name="information">

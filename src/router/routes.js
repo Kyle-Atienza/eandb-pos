@@ -7,6 +7,7 @@ const routes = [
       {
         path: 'counter',
         component: () => import('pages/CounterPage.vue'),
+        name: 'Counter',
       },
       {
         path: 'checkout',
@@ -15,6 +16,7 @@ const routes = [
           {
             path: 'items',
             component: () => import('pages/CheckoutItemsPage.vue'),
+            name: 'Checkout Items',
           },
           {
             path: 'details',
@@ -43,6 +45,11 @@ const routes = [
       {
         path: 'inventory',
         component: () => import('pages/InventoryPage.vue'),
+      },
+      {
+        path: 'report',
+        component: () => import('pages/ReportPage.vue'),
+        name: 'Report',
       },
     ],
   },

@@ -20,9 +20,11 @@
             required
             :items="brands"
             label="Brand"
-            color="primary"
+            color="secondary"
+            label-color="secondary"
             @pick="(selected) => (product.brand = selected)"
             :rules="[(val) => !!val || '']"
+            outlined
           />
         </div>
       </q-card-section>
@@ -128,7 +130,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.q-field {
+/* .q-field {
   border: 2px solid $secondary;
   border-radius: 15px;
   color: $secondary;
@@ -137,15 +139,9 @@ export default {
   ::v-deep &__label {
     color: $secondary;
   }
-}
+} */
 
 ::v-deep .q-icon {
   color: $secondary;
-}
-
-.q-select {
-  &__dialog {
-    background: red !important;
-  }
 }
 </style>

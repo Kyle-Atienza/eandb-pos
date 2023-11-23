@@ -10,15 +10,12 @@ export const useInvoiceStore = defineStore('invoice', {
     notes: '',
     paymentMethod: '',
     items: [],
+    invoices: [],
+    amountReceived: '',
+    change: '',
   }),
   getters: {
-    /* getTotal(state) {
-      return state.items.reduce((amount, item) => {
-        const itemAmount = amount + item.quantity * item.variant.amount;
-        amount = itemAmount;
-        return amount;
-      }, 0);
-    }, */
+    selectedProductVariants() {},
     isEmpty(state) {
       return !state.items.length;
     },
@@ -31,15 +28,21 @@ export const useInvoiceStore = defineStore('invoice', {
     },
   },
   actions: {
+    setInvoices(invoices) {
+      this.invoices = invoices;
+    },
     addItem(product) {
       this.items.push(product);
     },
     removeItem(key) {
-      this.items = this.items.filter((item) => item.key !== key);
+      this.items = this.items.filter(({ item }) => item !== key);
     },
     updateItem(key, updatedData) {
       const productIndex = this.items.map((item) => item.key).indexOf(key);
       this.items[productIndex] = updatedData;
+    },
+    clearItems() {
+      this.items = [];
     },
     hasItem(key) {
       return this.items.map((item) => item.key).includes(key);
@@ -47,8 +50,65 @@ export const useInvoiceStore = defineStore('invoice', {
     findItem(key) {
       return this.items.find((item) => item.key === key);
     },
+    productItems(id) {
+      const items = this.items.filter(({ item }) => {
+        const itemId = item.split('_')[0];
+        return itemId === id;
+      });
+
+      return items;
+    },
     updateDetails(key, value) {
       this.details[key] = value;
+    },
+    getQuantity(id) {
+      // find all items with the id provided
+      const products = this.items.filter(({ item }) => {
+        const itemId = item.split('_')[0];
+        return itemId === id;
+      });
+
+      const quantity = products.reduce((total, product) => {
+        total += product.quantity;
+        return total;
+      }, 0);
+
+      return quantity || 0;
+    },
+    getItemQuantity(key) {
+      const findItem = this.items.find(({ item }) => item === key);
+
+      if (!findItem) {
+        return 0;
+      }
+
+      const { quantity } = this.items.find(({ item }) => item === key);
+
+      return quantity;
+    },
+    setItemQuantity(key, addQuantity, replaceQuantity = 0) {
+      const itemIndex = this.items.map(({ item }) => item).indexOf(key);
+      let newQuantity = this.items[itemIndex].quantity + addQuantity;
+
+      if (!addQuantity) {
+        newQuantity = replaceQuantity;
+      }
+
+      this.items[itemIndex] = {
+        ...this.items[itemIndex],
+        quantity: newQuantity,
+      };
+
+      if (!newQuantity) {
+        this.items.splice(itemIndex, 1);
+      }
+    },
+    setChange() {
+      const total = getTotal(this.items);
+      const isValidAmount = this.amountReceived >= total;
+
+      this.change = isValidAmount ? this.amountReceived - total : '';
+      console.log(total - this.amountReceived);
     },
     async create() {
       return api.post('/invoices', {
@@ -57,14 +117,29 @@ export const useInvoiceStore = defineStore('invoice', {
         emailAddress: this.emailAddress,
         notes: this.notes,
         paymentMethod: this.paymentMethod,
+        total: getTotal(this.items),
         items: this.items.map((item) => ({
-          id: item._id,
-          item: item.key,
-          variant: item.variant._id,
+          item: item.item,
           quantity: item.quantity,
         })),
-        total: getTotal(this.items),
+        amountReceived: this.amountReceived,
+        change: this.change,
       });
+    },
+    async getAll(params) {
+      api({
+        url: '/invoices',
+        params,
+      })
+        .then((res) => {
+          const { data } = res.data;
+
+          // invoices.value = data;
+          this.invoices = data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     reset() {
       this.buyer = '';

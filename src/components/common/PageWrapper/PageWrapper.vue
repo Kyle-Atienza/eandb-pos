@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wrapper q-my-lg">
+  <div :class="'page-wrapper q-my-lg ${this.$props.class}'">
     <slot></slot>
   </div>
 </template>

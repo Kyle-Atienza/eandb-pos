@@ -33,23 +33,15 @@
 </template>
 
 <script>
-import { useInvoiceStore } from 'src/stores/invoice';
 import OutlinedTextInput from 'src/components/forms/input/OutlinedTextInput/OutlinedTextInput.vue';
-import { computed, inject } from 'vue';
+import { inject } from 'vue';
 
 export default {
   components: {
     OutlinedTextInput,
   },
   setup() {
-    const invoice = computed(() => {
-      const fetched = inject('fetchedInvoice');
-      if (!fetched) {
-        return useInvoiceStore();
-      }
-
-      return fetched.value;
-    });
+    const invoice = inject('invoice');
 
     return {
       invoice,
